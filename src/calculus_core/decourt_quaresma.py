@@ -77,6 +77,65 @@ def calcular_Np(perfil_spt, cota_asentamento):
     return (Nspt_cota_asentamento + Nspt_cota_acima + Nspt_cota_abaixo) / 3
 
 
+def calcular_Rp(alfa, Np, K, area_ponta):
+    """
+    Calcula a resistência de ponta da estaca.
+
+    Args:
+        alfa: Coeficiente alfa do tipo de solo.
+        Np: N_SPT médio na cota de assentamento.
+        K: Coeficiente K do tipo de solo.
+        area_ponta: Área da ponta da estaca.
+
+    Returns:
+        float: Resistência de ponta em kN.
+    """
+    return alfa * K * Np * area_ponta
+
+
+def calcular_Nl(perfil_spt, cota_asentamento):
+    """
+    Calcula o Nl_SPT médio ao longo do fuste da estaca,
+    desconsiderando as cotas utilizadas no Np.
+    Args:
+        perfil_spt: Lista de tuplas (N_SPT, tipo_solo).
+        cota_asentamento: Cota de assentamento para encontrar os indices,
+        para desconsiderar no cálculo.
+
+    Returns:
+        float: N_SPT médio ao longo do fuste da estaca.
+    """
+
+    Nl = 0
+    n = 0
+
+    index_cota_asentamento = cota_asentamento - 1  # Index baseado em 0
+    index_cota_acima = index_cota_asentamento - 1
+    if index_cota_acima <= 0:
+        return 0
+
+    for i in range(0, index_cota_acima):
+        Nl += perfil_spt[i][0]
+        n += 1
+    return Nl / n if n > 0 else 0
+
+
+def calcular_Rl(beta, Nl, perimetro, cota):
+    """
+    Calcula a resistência lateral da estaca.
+
+    Args:
+        beta: Coeficiente beta do tipo de solo.
+        Nl: N_SPT médio ao longo do fuste da estaca.
+        perimetro: Perímetro da seção transversal da estaca.
+        cota: Cota até onde calcular a resistência lateral.
+
+    Returns:
+        float: Resistência lateral em kN.
+    """
+    return beta * 10 * (Nl / 3 + 1) * perimetro * cota
+
+
 def normalizar_tipo_solo(tipo_solo, metodo):
     """
     Normaliza o tipo de solo para um formato padrão.
@@ -178,44 +237,78 @@ def calcular_decourt_quaresma(
     # Cálculo da Resistência de Ponta (Rp)
 
     cota_asentamento = estaca.comprimento
+    index_cota_asentamento = cota_asentamento - 1
     Np = calcular_Np(perfil_spt, cota_asentamento)
-    tipo_solo_ponta = perfil_spt[cota_asentamento - 1][1]
+    tipo_solo_ponta = perfil_spt[index_cota_asentamento][1]
     tipo_solo_ponta = normalizar_tipo_solo(tipo_solo_ponta, 'decourt_quaresma')
 
     K = coef_K[tipo_solo_ponta][estaca.processo_construcao]
 
     alfa = coef_alfa[tipo_solo_ponta][estaca.tipo]
-    q_p = alfa * K * Np * estaca.area_ponta()
+
+    Rp = calcular_Rp(alfa, Np, K, estaca.area_ponta())
+
+    # Cálculo da Resistência Lateral (Rl)
+    Rl = 0
+    Rl_parcial = 0
+    for i in range(0, cota_asentamento):
+        cota = i + 1
+        Nl = calcular_Nl(perfil_spt, cota)
+        tipo_solo_lateral = perfil_spt[i][1]
+        tipo_solo_lateral = normalizar_tipo_solo(
+            tipo_solo_lateral, 'decourt_quaresma'
+        )
+        beta = coef_beta[tipo_solo_lateral][estaca.tipo]
+        Rl_parcial = calcular_Rl(beta, Nl, estaca.perimetro(), cota)
+        Rl += Rl_parcial
 
     return {
-        'resistencia_ponta': q_p,
-        'resistencia_lateral': 0,
-        'capacidade_total': 0,
+        'resistencia_ponta': Rp,
+        'resistencia_lateral': Rl_parcial,
+        'resistencia_lateral_total': Rl,
+        'capacidade_total': Rp + Rl,
     }
 
 
 if __name__ == '__main__':
+    from pprint import pprint
+
     # Exemplo de uso
-    resultado = calcular_decourt_quaresma(
-        perfil_spt=[
-            (3, 'areia_argilosa'),
-            (3, 'areia_argilosa'),
-            (5, 'areia_argilosa'),
-            (6, 'argila_arenosa'),
-            (8, 'argila_arenosa'),
-            (13, 'argila_arenosa'),
-            (17, 'argila_arenosa'),
-            (25, 'argila_arenosa'),
-            (27, 'argila_areno_siltosa'),
-            (32, 'argila_areno_siltosa'),
-            (36, 'argila_areno_siltosa'),
-        ],
-        estaca=Estaca(
+    perfil_spt = [
+        (3, 'areia_argilosa'),
+        (3, 'areia_argilosa'),
+        (5, 'areia_argilosa'),
+        (6, 'argila_arenosa'),
+        (8, 'argila_arenosa'),
+        (13, 'argila_arenosa'),
+        (17, 'argila_arenosa'),
+        (25, 'argila_arenosa'),
+        (27, 'argila_areno_siltosa'),
+        (32, 'argila_areno_siltosa'),
+        (36, 'argila_areno_siltosa'),
+    ]
+    resultado = []
+    for i in range(1, len(perfil_spt) + 1):
+        estaca = Estaca(
             tipo='cravada',
             processo_construcao='deslocamento',
             formato='quadrada',
             secao_transversal=0.3,
-            comprimento=11,
-        ),
-    )
-    print(resultado)
+            comprimento=i,
+        )
+        decourt_quaresma = calcular_decourt_quaresma(
+            perfil_spt,
+            estaca,
+        )
+        resultado.append(
+            {
+                'cota': i,
+                'resistencia_ponta': decourt_quaresma['resistencia_ponta'],
+                'resistencia_lateral': decourt_quaresma['resistencia_lateral'],
+                'resistencia_lateral_total': decourt_quaresma[
+                    'resistencia_lateral_total'
+                ],
+                'capacidade_total': decourt_quaresma['capacidade_total'],
+            }
+        )
+    pprint(resultado, sort_dicts=False)
