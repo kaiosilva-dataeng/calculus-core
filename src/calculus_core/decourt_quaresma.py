@@ -45,9 +45,9 @@ class Estaca:
             return largura * self.comprimento
 
 
-def calcular_Np(perfil_spt, cota):
+def calcular_Np(perfil_spt, cota_asentamento):
     """
-    Calcula o N_SPT médio na cota especificada,
+    Calcula o Np_SPT médio na cota especificada,
     considerando a média do metro acima e abaixo.
 
     Args:
@@ -57,24 +57,24 @@ def calcular_Np(perfil_spt, cota):
     Returns:
         float: N_SPT médio na cota especificada.
     """
-    index_cota = cota - 1  # Ajuste para índice zero
+    index_cota_asentamento = cota_asentamento - 1  # Index baseado em 0
 
-    if index_cota <= 0 or index_cota >= len(perfil_spt):
-        raise ValueError('Cota inválida para o perfil SPT.')
+    if index_cota_asentamento < 0 or index_cota_asentamento >= len(perfil_spt):
+        raise ValueError('Cota asentamento inválida para o perfil SPT.')
 
-    cota_asentamento = perfil_spt[index_cota][0]
+    Nspt_cota_asentamento = perfil_spt[index_cota_asentamento][0]
 
-    if index_cota - 1 < 0:
-        cota_acima = perfil_spt[index_cota][0]
-    elif index_cota - 1 >= 0:
-        cota_acima = perfil_spt[index_cota - 1][0]
+    if index_cota_asentamento - 1 < 0:
+        Nspt_cota_acima = perfil_spt[index_cota_asentamento][0]
+    elif index_cota_asentamento - 1 >= 0:
+        Nspt_cota_acima = perfil_spt[index_cota_asentamento - 1][0]
 
-    if index_cota + 1 >= len(perfil_spt):
-        cota_abaixo = 50
-    elif index_cota + 1 < len(perfil_spt):
-        cota_abaixo = perfil_spt[index_cota + 1][0]
+    if index_cota_asentamento + 1 >= len(perfil_spt):
+        Nspt_cota_abaixo = 50
+    elif index_cota_asentamento + 1 < len(perfil_spt):
+        Nspt_cota_abaixo = perfil_spt[index_cota_asentamento + 1][0]
 
-    return (cota_asentamento + cota_acima + cota_abaixo) / 3
+    return (Nspt_cota_asentamento + Nspt_cota_acima + Nspt_cota_abaixo) / 3
 
 
 def normalizar_tipo_solo(tipo_solo, metodo):
