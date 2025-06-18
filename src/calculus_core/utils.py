@@ -1,8 +1,3 @@
-from collections.abc import Callable
-
-from calculus_core.models import Estaca, PerfilSPT
-
-
 def normalizar_tipo_solo(tipo_solo: str, metodo: str) -> str:
     """
     Normaliza o tipo de solo para um formato padrão.
@@ -53,57 +48,3 @@ def normalizar_tipo_estaca(tipo_estaca: str, metodo: str) -> str:
         ]:
             return tipo_estaca
     return tipo_estaca
-
-
-def calcular_capacidade_estaca(
-    metodo_calculo: Callable[[PerfilSPT, Estaca], dict],
-    perfil_spt: PerfilSPT,
-    tipo_estaca: str,
-    processo_construcao: str,
-    formato: str,
-    secao_transversal: float,
-):
-    """
-    Calcula a capacidade de carga de uma estaca metro a metro
-    usando o método especificado.
-
-    Args:
-        metodo_calculo (callable): Método de cálculo a ser utilizado.
-        perfil_spt: Perfil SPT da estaca.
-        tipo_estaca: Tipo de estaca (cravada, franki, pré_moldada, metálica,
-            ômega, escavada, escavada_bentonita, hélice_contínua, raiz,
-            injetada).
-        processo_construcao: escavada, deslocamento.
-        formato: Formato da estaca (circular, quadrada).
-        secao_transversal: Seção transversal da estaca em metros.
-
-    Returns:
-        dict: Resistências de ponta, lateral e total em kN.
-    """
-
-    resultado: list[dict] = []
-    for i in range(1, len(perfil_spt) + 1):
-        estaca = Estaca(
-            tipo=tipo_estaca,
-            processo_construcao=processo_construcao,
-            formato=formato,
-            secao_transversal=secao_transversal,
-            comprimento=i,
-        )
-
-        resultado_estaca = metodo_calculo(
-            perfil_spt,
-            estaca,
-        )
-        resultado.append(
-            {
-                'cota': i,
-                'resistencia_ponta': resultado_estaca['resistencia_ponta'],
-                'resistencia_lateral': resultado_estaca['resistencia_lateral'],
-                'resistencia_lateral_total': resultado_estaca[
-                    'resistencia_lateral_total'
-                ],
-                'capacidade_total': resultado_estaca['capacidade_total'],
-            }
-        )
-    return resultado
