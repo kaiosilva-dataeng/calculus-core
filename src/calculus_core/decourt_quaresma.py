@@ -189,9 +189,9 @@ def calcular_decourt_quaresma(
     }
     # Cálculo da Resistência de Ponta (Rp)
 
-    cota_asentamento = estaca.comprimento
-    Np = calcular_Np(perfil_spt, cota_asentamento)
-    tipo_solo_ponta = perfil_spt.obter_medida(cota_asentamento).tipo_solo
+    medida_cota_asentamento = perfil_spt.obter_medida(estaca.comprimento)
+    Np = calcular_Np(perfil_spt, medida_cota_asentamento.profundidade)
+    tipo_solo_ponta = medida_cota_asentamento.tipo_solo
     tipo_solo_ponta = normalizar_tipo_solo(tipo_solo_ponta, 'décourt_quaresma')
 
     K = coef_K[tipo_solo_ponta][estaca.processo_construcao]
@@ -203,7 +203,7 @@ def calcular_decourt_quaresma(
     # Cálculo da Resistência Lateral (Rl)
     Rl = 0
     Rl_parcial = 0
-    for cota in range(1, cota_asentamento + 1):
+    for cota in range(1, medida_cota_asentamento.profundidade + 1):
         Nl = calcular_Nl(perfil_spt, cota)
         tipo_solo_lateral = perfil_spt.obter_medida(cota).tipo_solo
         tipo_solo_lateral = normalizar_tipo_solo(
