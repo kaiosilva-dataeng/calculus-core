@@ -111,7 +111,7 @@ def normalizar_tipo_solo(tipo_solo, metodo):
 
 
 def calcular_decourt_quaresma(
-    perfil_spt,
+    perfil_spt: PerfilSPT,
     estaca: Estaca,
 ):
     """
