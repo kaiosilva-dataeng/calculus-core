@@ -71,8 +71,9 @@ class MedidaSPT:
 
 
 class PerfilSPT:
-    def __init__(self, nome_sondagem: str = 'SP-01'):
+    def __init__(self, nome_sondagem: str = 'SP-01', confiavel: bool = True):
         self.nome_sondagem = nome_sondagem
+        self.confiavel = confiavel
         self.medidas: list[MedidaSPT] = []
 
     def adicionar_medida(self, profundidade, N_SPT, tipo_solo):
