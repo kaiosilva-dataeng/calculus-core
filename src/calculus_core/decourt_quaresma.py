@@ -99,7 +99,7 @@ def normalizar_tipo_solo(tipo_solo, metodo):
     Returns:
         str: Tipo de solo normalizado.
     """
-    if metodo == 'decourt_quaresma':
+    if metodo == 'décourt_quaresma':
         tipo_solo = tipo_solo.lower().replace(' ', '_').replace('-', '_')
         if tipo_solo in ['argila', 'argila_arenosa', 'argila_areno_siltosa']:
             return 'argila'
@@ -139,7 +139,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.85,
             'escavada_bentonita': 0.85,
-            'helice_continua': 0.3,
+            'hélice_contínua': 0.3,
             'raiz': 0.85,
             'injetada': 1,
         },
@@ -147,7 +147,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.6,
             'escavada_bentonita': 0.6,
-            'helice_continua': 0.3,
+            'hélice_contínua': 0.3,
             'raiz': 0.6,
             'injetada': 1,
         },
@@ -155,7 +155,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.5,
             'escavada_bentonita': 0.5,
-            'helice_continua': 0.3,
+            'hélice_contínua': 0.3,
             'raiz': 0.5,
             'injetada': 1,
         },
@@ -166,7 +166,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.8,
             'escavada_bentonita': 0.9,
-            'helice_continua': 1,
+            'hélice_contínua': 1,
             'raiz': 1.5,
             'injetada': 3,
         },
@@ -174,7 +174,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.65,
             'escavada_bentonita': 0.75,
-            'helice_continua': 1,
+            'hélice_contínua': 1,
             'raiz': 1.5,
             'injetada': 3,
         },
@@ -182,7 +182,7 @@ def calcular_decourt_quaresma(
             'cravada': 1,
             'escavada': 0.5,
             'escavada_bentonita': 0.6,
-            'helice_continua': 1,
+            'hélice_contínua': 1,
             'raiz': 1.5,
             'injetada': 3,
         },
@@ -192,7 +192,7 @@ def calcular_decourt_quaresma(
     cota_asentamento = estaca.comprimento
     Np = calcular_Np(perfil_spt, cota_asentamento)
     tipo_solo_ponta = perfil_spt.obter_medida(cota_asentamento).tipo_solo
-    tipo_solo_ponta = normalizar_tipo_solo(tipo_solo_ponta, 'decourt_quaresma')
+    tipo_solo_ponta = normalizar_tipo_solo(tipo_solo_ponta, 'décourt_quaresma')
 
     K = coef_K[tipo_solo_ponta][estaca.processo_construcao]
 
@@ -207,7 +207,7 @@ def calcular_decourt_quaresma(
         Nl = calcular_Nl(perfil_spt, cota)
         tipo_solo_lateral = perfil_spt.obter_medida(cota).tipo_solo
         tipo_solo_lateral = normalizar_tipo_solo(
-            tipo_solo_lateral, 'decourt_quaresma'
+            tipo_solo_lateral, 'décourt_quaresma'
         )
         beta = coef_beta[tipo_solo_lateral][estaca.tipo]
         Rl_parcial = calcular_Rl(beta, Nl, estaca.perimetro(), cota)
@@ -235,7 +235,7 @@ def calcular_capacidade_estaca(
     Args:
         perfil_spt: Perfil SPT da estaca.
         tipo_estaca: Tipo de estaca (cravada, escavada, escavada_bentonita,
-            helice_continua, raiz, injetada).
+            hélice_contínua, raiz, injetada).
         processo_construcao: escavada, deslocamento.
         formato: Formato da estaca (circular, quadrada).
         secao_transversal: Seção transversal da estaca em metros.
