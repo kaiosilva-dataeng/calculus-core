@@ -1,4 +1,5 @@
 import math
+from abc import ABC, abstractmethod
 
 
 class Estaca:
@@ -144,3 +145,26 @@ class PerfilSPT:
         raise ValueError(
             f'Medida não encontrada para a profundidade {profundidade}m.'
         )
+
+
+class MetodoCalculo(ABC):
+    """
+    Classe abstrata para métodos de cálculo de fundações.
+    """
+
+    @abstractmethod
+    def calcular(self, perfil_spt: PerfilSPT, estaca: Estaca) -> dict:
+        """
+        Método abstrato que deve ser implementado por subclasses.
+        Realiza o cálculo específico do método de fundação.
+
+        Returns:
+            dict: Dicionário com os resultados do cálculo, com chaves:
+            {
+                'resistencia_ponta',
+                'resistencia_lateral',
+                'resistencia_lateral_total',
+                'resistencia_total',
+            }
+        """
+        pass
