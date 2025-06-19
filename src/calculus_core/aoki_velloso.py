@@ -31,6 +31,97 @@ fatores_f1_f2_aoki_velloso_1975 = {
     'ômega': {'F1': 2.00, 'F2': lambda f1: 2 * f1},
 }
 
+coeficientes_aoki_velloso_1975_laprovitera_1988 = {
+    'areia': {
+        'k_kpa': 600,
+        'alpha_perc': 1.4,
+        'alpha_star_perc': 1.4,
+    },
+    'areia_siltosa': {
+        'k_kpa': 530,
+        'alpha_perc': 1.9,
+        'alpha_star_perc': 1.9,
+    },
+    'areia_silto_argilosa': {
+        'k_kpa': 530,
+        'alpha_perc': 2.4,
+        'alpha_star_perc': 2.4,
+    },
+    'areia_argilo_siltosa': {
+        'k_kpa': 530,
+        'alpha_perc': 2.8,
+        'alpha_star_perc': 2.8,
+    },
+    'areia_argilosa': {
+        'k_kpa': 530,
+        'alpha_perc': 3.0,
+        'alpha_star_perc': 3.0,
+    },
+    'silte_arenoso': {
+        'k_kpa': 480,
+        'alpha_perc': 3.0,
+        'alpha_star_perc': 3.0,
+    },
+    'silte_areno_argiloso': {
+        'k_kpa': 380,
+        'alpha_perc': 3.0,
+        'alpha_star_perc': 3.0,
+    },
+    'silte': {
+        'k_kpa': 480,
+        'alpha_perc': 3.0,
+        'alpha_star_perc': 3.0,
+    },
+    'silte_argilo_arenoso': {
+        'k_kpa': 380,
+        'alpha_perc': 3.0,
+        'alpha_star_perc': 3.0,
+    },
+    'silte_argiloso': {
+        'k_kpa': 300,
+        'alpha_perc': 3.4,
+        'alpha_star_perc': 3.4,
+    },
+    'argila_arenosa': {
+        'k_kpa': 480,
+        'alpha_perc': 4.0,
+        'alpha_star_perc': 2.6,
+    },
+    'argila_areno_siltosa': {
+        'k_kpa': 380,
+        'alpha_perc': 4.5,
+        'alpha_star_perc': 3.0,
+    },
+    'argila_silto_arenosa': {
+        'k_kpa': 380,
+        'alpha_perc': 5.0,
+        'alpha_star_perc': 3.3,
+    },
+    'argila_siltosa': {
+        'k_kpa': 250,
+        'alpha_perc': 5.5,
+        'alpha_star_perc': 3.6,
+    },
+    'argila': {
+        'k_kpa': 250,
+        'alpha_perc': 6.0,
+        'alpha_star_perc': 4.0,
+    },
+}
+
+fatores_f1_f2_aoki_velloso_1975_laprovitera_1988 = {
+    'franki': {'F1': 2.50, 'F2': 3.0},
+    'metálica': {'F1': 2.4, 'F2': 3.4},
+    'pré_moldada': {
+        'F1': 2.0,
+        'F2': 3.5,
+    },
+    'escavada': {'F1': 4.50, 'F2': 4.50},
+    'raiz': {'F1': 2.00, 'F2': lambda f1: 2 * f1},
+    'hélice_contínua': {'F1': 2.00, 'F2': lambda f1: 2 * f1},
+    'ômega': {'F1': 2.00, 'F2': lambda f1: 2 * f1},
+}
+
 
 class AokiVelloso(MetodoCalculo):
     """
@@ -39,8 +130,8 @@ class AokiVelloso(MetodoCalculo):
     """
 
     def __init__(self, coeficientes_aoki_velloso: dict, fatores_f1_f2: dict):
-        self.coeficientes_aoki_velloso = coeficientes_aoki_velloso
-        self.fatores_f1_f2 = fatores_f1_f2
+        self._coeficientes_aoki_velloso = coeficientes_aoki_velloso
+        self._fatores_f1_f2 = fatores_f1_f2
 
     @staticmethod
     def obter_fatores_F1_F2(
@@ -51,6 +142,8 @@ class AokiVelloso(MetodoCalculo):
         """
         Busca e calcula os fatores F1 e F2 para um dado tipo de estaca.
         """
+        tipo_estaca = normalizar_tipo_estaca(tipo_estaca, 'aoki_velloso')
+
         if tipo_estaca not in fatores_f1_f2:
             raise ValueError(
                 f"Tipo de estaca '{tipo_estaca}' não reconhecido."
@@ -70,13 +163,60 @@ class AokiVelloso(MetodoCalculo):
                 )
             f1_calculado = valor_f1(diametro_estaca)
         else:
-            # Se não for uma função, é um número simples
             f1_calculado = valor_f1
 
-        # Calcula F2 usando o valor de F1 já resolvido
-        f2_calculado = func_f2(f1_calculado)
+        if callable(func_f2):
+            f2_calculado = func_f2(f1_calculado)
+        else:
+            f2_calculado = func_f2
 
         return f1_calculado, f2_calculado
+
+    def obter_coeficiente_K(self, tipo_solo: str) -> float:
+        """
+        Obtém o coeficiente K para um tipo de solo específico.
+
+        Args:
+            perfil_spt: Perfil SPT contendo as medidas de N_SPT e tipo de solo.
+            tipo_solo: Tipo de solo para obter o coeficiente K.
+
+        Returns:
+            float: Coeficiente K em kPa.
+        """
+
+        tipo_solo = normalizar_tipo_solo(tipo_solo, 'aoki_velloso')
+
+        if tipo_solo not in self._coeficientes_aoki_velloso:
+            raise ValueError(f"Tipo de solo '{tipo_solo}' não reconhecido.")
+        return self._coeficientes_aoki_velloso[tipo_solo]['k_kpa']
+
+    def obter_coeficiente_alfa(
+        self, perfil_spt: PerfilSPT, tipo_solo: str
+    ) -> float:
+        """
+        Obtém o coeficiente alfa para um tipo de solo específico.
+
+        Args:
+            perfil_spt: Perfil SPT contendo as medidas de N_SPT e tipo de solo.
+            tipo_solo: Tipo de solo para obter o coeficiente alfa.
+
+        Returns:
+            float: Coeficiente alfa em porcentagem.
+        """
+
+        tipo_solo = normalizar_tipo_solo(tipo_solo, 'aoki_velloso')
+
+        if tipo_solo not in self._coeficientes_aoki_velloso:
+            raise ValueError(f"Tipo de solo '{tipo_solo}' não reconhecido.")
+        if (
+            not perfil_spt.confiavel
+            and 'alpha_star_perc' in self._coeficientes_aoki_velloso[tipo_solo]
+        ):
+            return (
+                self._coeficientes_aoki_velloso[tipo_solo]['alpha_star_perc']
+                / 100
+            )
+        return self._coeficientes_aoki_velloso[tipo_solo]['alpha_perc'] / 100
 
     @staticmethod
     def calcular_Rp(K, Np, f1, area_ponta):
@@ -113,32 +253,48 @@ class AokiVelloso(MetodoCalculo):
         return perimetro * espessura_camada * (alfa * K * Nl) / f2
 
     def calcular(self, perfil_spt: PerfilSPT, estaca: Estaca) -> dict:
-        medida_cota_asentamento = perfil_spt.obter_medida(estaca.comprimento)
-        Np = medida_cota_asentamento.N_SPT
-        tipo_solo_ponta = medida_cota_asentamento.tipo_solo
-        tipo_solo_ponta = normalizar_tipo_solo(tipo_solo_ponta, 'aoki_velloso')
-        K = self.coeficientes_aoki_velloso[tipo_solo_ponta]['k_kpa']
+        """
+        Calcula a capacidade de carga de estacas
+        pelo método de Aoki e Velloso (1975).
 
-        tipo_estaca = normalizar_tipo_estaca(estaca.tipo, 'aoki_velloso')
+        Args:
+            perfil_spt: Perfil SPT contendo as medidas de N_SPT e tipo de solo.
+            estaca: Objeto Estaca contendo informações sobre a estaca.
+
+        Returns:
+            dict: Dicionário contendo as resistências de ponta,
+            resistência lateral parcial,
+            resistência lateral total e total da estaca.
+        """
+
+        # Cálculo da Resistência de Ponta (Rp)
+        medida_cota_asentamento = perfil_spt.obter_medida(estaca.comprimento)
+        K = self.obter_coeficiente_K(medida_cota_asentamento.tipo_solo)
         f1, f2 = self.obter_fatores_F1_F2(
-            self.fatores_f1_f2, tipo_estaca, estaca.secao_transversal
+            self._fatores_f1_f2, estaca.tipo, estaca.secao_transversal
         )
 
-        Rp = self.calcular_Rp(K, Np, f1, estaca.area_ponta())
+        Rp = self.calcular_Rp(
+            K, medida_cota_asentamento.N_SPT, f1, estaca.area_ponta()
+        )
 
         # Cálculo da Resistência Lateral (Rl)
         Rl = 0
         Rl_parcial = 0
         for cota in range(1, medida_cota_asentamento.profundidade + 1):
-            Nl = perfil_spt.obter_medida(cota).N_SPT
-            tipo_solo_lateral = perfil_spt.obter_medida(cota).tipo_solo
-            K = self.coeficientes_aoki_velloso[tipo_solo_lateral]['k_kpa']
-            alfa = (
-                self.coeficientes_aoki_velloso[tipo_solo_lateral]['alpha_perc']
-                / 100
+            medida_cota = perfil_spt.obter_medida(cota)
+
+            K = self.obter_coeficiente_K(medida_cota.tipo_solo)
+            alfa = self.obter_coeficiente_alfa(
+                perfil_spt, medida_cota.tipo_solo
             )
             Rl_parcial = self.calcular_Rl_parcial(
-                alfa, K, Nl, f2, estaca.perimetro(), espessura_camada=1
+                alfa,
+                K,
+                medida_cota.N_SPT,
+                f2,
+                estaca.perimetro(),
+                espessura_camada=1,
             )
             Rl += Rl_parcial
 
@@ -153,4 +309,8 @@ class AokiVelloso(MetodoCalculo):
 aoki_velloso_1975 = AokiVelloso(
     coeficientes_aoki_velloso=coeficientes_aoki_velloso_1975,
     fatores_f1_f2=fatores_f1_f2_aoki_velloso_1975,
+)
+aoki_velloso_1975_laprovitera_1988 = AokiVelloso(
+    coeficientes_aoki_velloso=coeficientes_aoki_velloso_1975_laprovitera_1988,
+    fatores_f1_f2=fatores_f1_f2_aoki_velloso_1975_laprovitera_1988,
 )
