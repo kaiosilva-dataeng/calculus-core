@@ -1,3 +1,5 @@
+from calculus_core.aoki_velloso import AokiVelloso
+from calculus_core.decourt_quaresma import DecourtQuaresma
 from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
 
 
@@ -28,7 +30,13 @@ def calcular_capacidade_estaca(
     """
 
     resultado: list[dict] = []
-    for i in range(1, len(perfil_spt) + 1):
+
+    if isinstance(metodo_calculo, AokiVelloso):
+        cota_parada = len(perfil_spt) - 1
+    elif isinstance(metodo_calculo, DecourtQuaresma):
+        cota_parada = len(perfil_spt) - 2
+
+    for i in range(1, cota_parada + 1):
         estaca = Estaca(
             tipo=tipo_estaca,
             processo_construcao=processo_construcao,
@@ -43,10 +51,10 @@ def calcular_capacidade_estaca(
                 'cota': i,
                 'resistencia_ponta': resultado_estaca['resistencia_ponta'],
                 'resistencia_lateral': resultado_estaca['resistencia_lateral'],
-                'resistencia_lateral_total': resultado_estaca[
-                    'resistencia_lateral_total'
+                'capacidade_carga': resultado_estaca['capacidade_carga'],
+                'capacidade_carga_adm': resultado_estaca[
+                    'capacidade_carga_adm'
                 ],
-                'capacidade_total': resultado_estaca['capacidade_total'],
             }
         )
     return resultado
