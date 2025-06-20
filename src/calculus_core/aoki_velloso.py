@@ -219,6 +219,33 @@ class AokiVelloso(MetodoCalculo):
         return self._coeficientes_aoki_velloso[tipo_solo]['alpha_perc'] / 100
 
     @staticmethod
+    def calcular_Np(perfil_spt: PerfilSPT, cota_assentamento: int):
+        """
+            Calcula o Np_SPT médio na cota especificada,
+            considerando a média do metro acima e abaixo.
+
+        Args:
+            perfil_spt: Lista de tuplas (N_SPT, tipo_solo).
+            cota: Cota para calcular o N_SPT médio.
+
+        Returns:
+            float: N_SPT médio na cota especificada.
+        """
+
+        if cota_assentamento not in perfil_spt:
+            raise ValueError('Cota assentamento inválida para o perfil SPT.')
+
+        cota_apoio_ponta = cota_assentamento + 1
+        if cota_apoio_ponta not in perfil_spt:
+            raise ValueError(
+                'Cota de apoio da ponta inválida para o perfil SPT.'
+            )
+
+        camada_apoio_ponta = perfil_spt.obter_medida(cota_apoio_ponta)
+
+        return camada_apoio_ponta.N_SPT
+
+    @staticmethod
     def calcular_Rp(K, Np, f1, area_ponta):
         """
         Calcula a resistência de ponta da estaca.
@@ -252,6 +279,21 @@ class AokiVelloso(MetodoCalculo):
         """
         return perimetro * espessura_camada * (alfa * K * Nl) / f2
 
+    @staticmethod
+    def calcular_carga_adm(Rp, Rl):
+        """
+        Calcula a capacidade de carga admissível da estaca.
+
+        Args:
+            Rp: Resistência de ponta da estaca.
+            Rl: Resistência lateral da estaca.
+
+        Returns:
+            float: Capacidade de carga admissível em kN.
+        """
+        fs = 2
+        return (Rp + Rl) / fs
+
     def calcular(self, perfil_spt: PerfilSPT, estaca: Estaca) -> dict:
         """
         Calcula a capacidade de carga de estacas
@@ -268,43 +310,45 @@ class AokiVelloso(MetodoCalculo):
         """
 
         # Cálculo da Resistência de Ponta (Rp)
-        medida_cota_assentamento = perfil_spt.obter_medida(
-            estaca.cota_assentamento
+        Np = self.calcular_Np(perfil_spt, estaca.cota_assentamento)
+
+        camada_apoio_ponta = perfil_spt.obter_medida(
+            estaca.cota_assentamento + 1
         )
-        K = self.obter_coeficiente_K(medida_cota_assentamento.tipo_solo)
+        K = self.obter_coeficiente_K(camada_apoio_ponta.tipo_solo)
         f1, f2 = self.obter_fatores_F1_F2(
             self._fatores_f1_f2, estaca.tipo, estaca.secao_transversal
         )
 
-        Rp = self.calcular_Rp(
-            K, medida_cota_assentamento.N_SPT, f1, estaca.area_ponta()
-        )
+        Rp = self.calcular_Rp(K, Np, f1, estaca.area_ponta())
 
         # Cálculo da Resistência Lateral (Rl)
         Rl = 0
         Rl_parcial = 0
-        for cota in range(2, medida_cota_assentamento.profundidade + 1):
-            medida_cota = perfil_spt.obter_medida(cota)
+        for cota in range(2, estaca.cota_assentamento + 1):
+            camada_lateral = perfil_spt.obter_medida(cota)
 
-            K = self.obter_coeficiente_K(medida_cota.tipo_solo)
+            K = self.obter_coeficiente_K(camada_lateral.tipo_solo)
             alfa = self.obter_coeficiente_alfa(
-                perfil_spt, medida_cota.tipo_solo
+                perfil_spt, camada_lateral.tipo_solo
             )
             Rl_parcial = self.calcular_Rl_parcial(
                 alfa,
                 K,
-                medida_cota.N_SPT,
+                camada_lateral.N_SPT,
                 f2,
                 estaca.perimetro(),
                 espessura_camada=1,
             )
             Rl += Rl_parcial
 
+        carga_adm = self.calcular_carga_adm(Rp, Rl)
+
         return {
             'resistencia_ponta': Rp,
-            'resistencia_lateral': Rl_parcial,
-            'resistencia_lateral_total': Rl,
-            'capacidade_total': Rp + Rl,
+            'resistencia_lateral': Rl,
+            'capacidade_carga': Rp + Rl,
+            'capacidade_carga_adm': carga_adm,
         }
 
 
