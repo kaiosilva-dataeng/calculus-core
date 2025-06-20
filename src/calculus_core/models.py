@@ -125,13 +125,20 @@ class PerfilSPT:
         if not self.medidas:
             raise ValueError('Nenhuma medida registrada no perfil SPT.')
 
-        if profundidade > self.medidas[-1].profundidade:
+        if profundidade - self.medidas[-1].profundidade == 1 and aprox:
             return MedidaSPT(profundidade, 50, 'impenetravel')
+        if profundidade > self.medidas[-1].profundidade and not aprox:
+            raise ValueError(
+                (
+                    f'Profundidade {profundidade}m está abaixo da profundidade'
+                    ' máxima registrada.'
+                )
+            )
         if profundidade < self.medidas[0].profundidade and not aprox:
             raise ValueError(
                 (
-                    f'Profundidade {profundidade}m está acima da profundidade '
-                    'mínima registrada.'
+                    f'Profundidade {profundidade}m está acima da profundidade'
+                    ' mínima registrada.'
                 )
             )
         for medida in self.medidas:
