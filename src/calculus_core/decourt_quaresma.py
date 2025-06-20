@@ -103,7 +103,9 @@ class DecourtQuaresma(MetodoCalculo):
         medida_cota_acima = perfil_spt.obter_medida(
             cota_assentamento - 1, aprox=True
         )
-        medida_cota_abaixo = perfil_spt.obter_medida(cota_assentamento + 1)
+        medida_cota_abaixo = perfil_spt.obter_medida(
+            cota_assentamento + 1, aprox=True
+        )
 
         return (
             medida_cota_assentamento.N_SPT
