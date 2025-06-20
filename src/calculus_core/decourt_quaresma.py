@@ -82,7 +82,7 @@ class DecourtQuaresma(MetodoCalculo):
         self._coef_beta = coef_beta
 
     @staticmethod
-    def calcular_Np(perfil_spt: PerfilSPT, cota_asentamento: int):
+    def calcular_Np(perfil_spt: PerfilSPT, cota_assentamento: int):
         """
             Calcula o Np_SPT médio na cota especificada,
             considerando a média do metro acima e abaixo.
@@ -95,30 +95,30 @@ class DecourtQuaresma(MetodoCalculo):
             float: N_SPT médio na cota especificada.
         """
 
-        if cota_asentamento not in perfil_spt:
-            raise ValueError('Cota asentamento inválida para o perfil SPT.')
+        if cota_assentamento not in perfil_spt:
+            raise ValueError('Cota assentamento inválida para o perfil SPT.')
 
-        medida_cota_asentamento = perfil_spt.obter_medida(cota_asentamento)
+        medida_cota_assentamento = perfil_spt.obter_medida(cota_assentamento)
 
         medida_cota_acima = perfil_spt.obter_medida(
-            cota_asentamento - 1, aprox=True
+            cota_assentamento - 1, aprox=True
         )
-        medida_cota_abaixo = perfil_spt.obter_medida(cota_asentamento + 1)
+        medida_cota_abaixo = perfil_spt.obter_medida(cota_assentamento + 1)
 
         return (
-            medida_cota_asentamento.N_SPT
+            medida_cota_assentamento.N_SPT
             + medida_cota_acima.N_SPT
             + medida_cota_abaixo.N_SPT
         ) / 3
 
     @staticmethod
-    def calcular_Nl(perfil_spt: PerfilSPT, cota_asentamento: int):
+    def calcular_Nl(perfil_spt: PerfilSPT, cota_assentamento: int):
         """
         Calcula o Nl_SPT médio ao longo do fuste da estaca,
         desconsiderando as cotas utilizadas no Np.
         Args:
             perfil_spt: Lista de tuplas (N_SPT, tipo_solo).
-            cota_asentamento: Cota de assentamento para encontrar os indices,
+            cota_assentamento: Cota de assentamento para encontrar os indices,
             para desconsiderar no cálculo.
 
         Returns:
@@ -127,7 +127,7 @@ class DecourtQuaresma(MetodoCalculo):
 
         Nl = 0
         n = 0
-        cota_acima = cota_asentamento - 1
+        cota_acima = cota_assentamento - 1
 
         if cota_acima not in perfil_spt:
             return 0
@@ -181,7 +181,7 @@ class DecourtQuaresma(MetodoCalculo):
         Returns:
             float: Coeficiente K correspondente.
         """
-        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma')
+        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma', 'K')
 
         if tipo_solo not in self._coef_K:
             raise ValueError(f'Tipo de solo inválido: {tipo_solo}')
@@ -204,7 +204,7 @@ class DecourtQuaresma(MetodoCalculo):
         Returns:
             float: Coeficiente alfa correspondente.
         """
-        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma')
+        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma', 'alfa')
         tipo_estaca = normalizar_tipo_estaca(tipo_estaca, 'décourt_quaresma')
 
         if tipo_solo not in self._coef_alfa:
@@ -226,7 +226,7 @@ class DecourtQuaresma(MetodoCalculo):
         Returns:
             float: Coeficiente beta correspondente.
         """
-        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma')
+        tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma', 'beta')
         tipo_estaca = normalizar_tipo_estaca(tipo_estaca, 'décourt_quaresma')
 
         if tipo_solo not in self._coef_beta:
@@ -252,21 +252,25 @@ class DecourtQuaresma(MetodoCalculo):
         """
 
         # Cálculo da Resistência de Ponta (Rp)
-        medida_cota_asentamento = perfil_spt.obter_medida(estaca.comprimento)
-        Np = self.calcular_Np(perfil_spt, medida_cota_asentamento.profundidade)
-        K = self.coef_K(
-            medida_cota_asentamento.tipo_solo, estaca.processo_construcao
+        medida_cota_assentamento = perfil_spt.obter_medida(estaca.comprimento)
+        Np = self.calcular_Np(
+            perfil_spt, medida_cota_assentamento.profundidade
         )
-        alfa = self.coef_alfa(medida_cota_asentamento.tipo_solo, estaca.tipo)
+        K = self.coef_K(
+            medida_cota_assentamento.tipo_solo, estaca.processo_construcao
+        )
+        alfa = self.coef_alfa(medida_cota_assentamento.tipo_solo, estaca.tipo)
 
         Rp = self.calcular_Rp(alfa, Np, K, estaca.area_ponta())
 
         # Cálculo da Resistência Lateral (Rl)
-        Nl = self.calcular_Nl(perfil_spt, medida_cota_asentamento.profundidade)
-        beta = self.coef_beta(medida_cota_asentamento.tipo_solo, estaca.tipo)
+        Nl = self.calcular_Nl(
+            perfil_spt, medida_cota_assentamento.profundidade
+        )
+        beta = self.coef_beta(medida_cota_assentamento.tipo_solo, estaca.tipo)
 
         Rl = self.calcular_Rl(
-            beta, Nl, estaca.perimetro(), medida_cota_asentamento.profundidade
+            beta, Nl, estaca.perimetro(), medida_cota_assentamento.profundidade
         )
 
         return {
