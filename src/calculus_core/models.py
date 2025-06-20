@@ -5,11 +5,11 @@ from abc import ABC, abstractmethod
 class Estaca:
     def __init__(
         self,
-        tipo,
-        processo_construcao,
-        formato,
-        secao_transversal,
-        cota_assentamento,
+        tipo: str,
+        processo_construcao: str,
+        formato: str,
+        secao_transversal: float,
+        cota_assentamento: int,
     ):
         if formato not in ['circular', 'quadrada']:
             raise ValueError(
@@ -19,7 +19,7 @@ class Estaca:
         self.processo_construcao = processo_construcao
         self.formato = formato
         self.secao_transversal = secao_transversal
-        self.cota_assentamento = cota_assentamento
+        self.cota_assentamento = int(cota_assentamento)
 
     def area_ponta(self):
         if self.formato == 'circular':
@@ -162,8 +162,8 @@ class MetodoCalculo(ABC):
             {
                 'resistencia_ponta',
                 'resistencia_lateral',
-                'resistencia_lateral_total',
-                'resistencia_total',
+                'capacidade_carga',
+                'capacidade_carga_adm',
             }
         """
         pass
