@@ -1,4 +1,6 @@
-def normalizar_tipo_solo(tipo_solo: str, metodo: str) -> str:
+def normalizar_tipo_solo(  # noqa: PLR0911
+    tipo_solo: str, metodo: str, tabela: str | None = None
+) -> str:
     """
     Normaliza o tipo de solo para um formato padrão.
 
@@ -9,12 +11,58 @@ def normalizar_tipo_solo(tipo_solo: str, metodo: str) -> str:
         str: Tipo de solo normalizado.
     """
     tipo_solo = tipo_solo.lower().replace(' ', '_').replace('-', '_')
-    if metodo == 'décourt_quaresma':
-        if tipo_solo in ['argila', 'argila_arenosa', 'argila_areno_siltosa']:
+    if metodo == 'décourt_quaresma' and tabela == 'alfa' or tabela == 'beta':
+        if tipo_solo in [
+            'argila',
+            'argila_arenosa',
+            'argila_areno_siltosa',
+            'argila_siltosa',
+            'argila_silto_arenosa',
+        ]:
             return 'argila'
-        elif tipo_solo in ['silte', 'silte_argiloso', 'silte_arenoso']:
+        elif tipo_solo in [
+            'silte',
+            'silte_arenoso',
+            'silte_areno_argiloso',
+            'silte_argiloso',
+            'silte_argilo_arenoso',
+        ]:
             return 'silte'
-        elif tipo_solo in ['areia', 'areia_argilosa', 'areia_areno_siltosa']:
+        elif tipo_solo in [
+            'areia',
+            'areia_siltosa',
+            'areia_silto_argilosa',
+            'areia_argilosa',
+            'areia_argilo_siltosa',
+        ]:
+            return 'areia'
+    if metodo == 'décourt_quaresma' and tabela == 'K':
+        if tipo_solo in [
+            'argila',
+            'argila_arenosa',
+            'argila_areno_siltosa',
+            'argila_siltosa',
+            'argila_silto_arenosa',
+        ]:
+            return 'argila'
+        elif tipo_solo in [
+            'silte',
+            'silte_arenoso',
+            'silte_areno_argiloso',
+        ]:
+            return 'silte_arenoso'
+        elif tipo_solo in [
+            'silte_argiloso',
+            'silte_argilo_arenoso',
+        ]:
+            return 'silte_argiloso'
+        elif tipo_solo in [
+            'areia',
+            'areia_siltosa',
+            'areia_silto_argilosa',
+            'areia_argilosa',
+            'areia_argilo_siltosa',
+        ]:
             return 'areia'
     return tipo_solo
 
