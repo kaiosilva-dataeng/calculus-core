@@ -98,19 +98,15 @@ class DecourtQuaresma(MetodoCalculo):
         if cota_assentamento not in perfil_spt:
             raise ValueError('Cota assentamento inválida para o perfil SPT.')
 
-        medida_cota_assentamento = perfil_spt.obter_medida(cota_assentamento)
+        camada_acima = perfil_spt.obter_medida(cota_assentamento)
 
-        medida_cota_acima = perfil_spt.obter_medida(
-            cota_assentamento - 1, aprox=True
-        )
-        medida_cota_abaixo = perfil_spt.obter_medida(
-            cota_assentamento + 1, aprox=True
+        camada_apoio_ponta = perfil_spt.obter_medida(cota_assentamento + 1)
+        camada_abaixo = perfil_spt.obter_medida(
+            camada_apoio_ponta.profundidade + 1
         )
 
         return (
-            medida_cota_assentamento.N_SPT
-            + medida_cota_acima.N_SPT
-            + medida_cota_abaixo.N_SPT
+            camada_apoio_ponta.N_SPT + camada_acima.N_SPT + camada_abaixo.N_SPT
         ) / 3
 
     @staticmethod
@@ -129,12 +125,12 @@ class DecourtQuaresma(MetodoCalculo):
 
         Nl = 0
         n = 0
-        cota_acima = cota_assentamento - 1
+        cota_acima = cota_assentamento
 
         if cota_acima not in perfil_spt:
             return 0
 
-        for i in range(1, cota_acima):
+        for i in range(2, cota_acima):
             Nl += perfil_spt.obter_medida(i).N_SPT
             n += 1
         return Nl / n if n > 0 else 0
@@ -156,7 +152,7 @@ class DecourtQuaresma(MetodoCalculo):
         return alfa * K * Np * area_ponta
 
     @staticmethod
-    def calcular_Rl(beta, Nl, perimetro, cota=1):
+    def calcular_Rl(beta, Nl, perimetro, espessura_camada=1):
         """
         Calcula a resistência lateral da estaca.
 
@@ -164,12 +160,13 @@ class DecourtQuaresma(MetodoCalculo):
             beta: Coeficiente beta do tipo de solo.
             Nl: N_SPT médio ao longo do fuste da estaca.
             perimetro: Perímetro da seção transversal da estaca.
-            cota: Cota até onde calcular a resistência lateral.
+            espessura_camada: Espessura da camada de solo em metros para
+                calcular a resistência lateral.
 
         Returns:
             float: Resistência lateral em kN.
         """
-        return beta * 10 * (Nl / 3 + 1) * perimetro * cota
+        return beta * 10 * (Nl / 3 + 1) * perimetro * espessura_camada
 
     def coef_K(self, tipo_solo: str, processo_construcao: str) -> float:
         """
@@ -238,6 +235,23 @@ class DecourtQuaresma(MetodoCalculo):
 
         return self._coef_beta[tipo_solo][tipo_estaca]
 
+    @staticmethod
+    def calcular_carga_adm(Rp, Rl):
+        """
+        Calcula a capacidade de carga admissível da estaca.
+
+        Args:
+            Rp: Resistência de ponta da estaca.
+            Rl: Resistência lateral da estaca.
+
+        Returns:
+            float: Capacidade de carga admissível em kN.
+        """
+        fs = 2
+        nbr_qadm = (Rp + Rl) / fs
+        decort_quaresma_qadm = Rp / 4 + Rl / 1.3
+        return min(nbr_qadm, decort_quaresma_qadm)
+
     def calcular(self, perfil_spt: PerfilSPT, estaca: Estaca) -> dict:
         """
         Calcula a capacidade de carga de estacas
@@ -254,37 +268,41 @@ class DecourtQuaresma(MetodoCalculo):
         """
 
         # Cálculo da Resistência de Ponta (Rp)
-        medida_cota_assentamento = perfil_spt.obter_medida(
-            estaca.cota_assentamento
+        camada_apoio_ponta = perfil_spt.obter_medida(
+            estaca.cota_assentamento + 1
         )
-        Np = self.calcular_Np(
-            perfil_spt, medida_cota_assentamento.profundidade
-        )
+        Np = self.calcular_Np(perfil_spt, estaca.cota_assentamento)
         K = self.coef_K(
-            medida_cota_assentamento.tipo_solo, estaca.processo_construcao
+            camada_apoio_ponta.tipo_solo, estaca.processo_construcao
         )
-        alfa = self.coef_alfa(medida_cota_assentamento.tipo_solo, estaca.tipo)
+        alfa = self.coef_alfa(camada_apoio_ponta.tipo_solo, estaca.tipo)
 
         Rp = self.calcular_Rp(alfa, Np, K, estaca.area_ponta())
 
         # Cálculo da Resistência Lateral (Rl)
-        Nl = self.calcular_Nl(
-            perfil_spt, medida_cota_assentamento.profundidade
-        )
-        beta = self.coef_beta(medida_cota_assentamento.tipo_solo, estaca.tipo)
+        Nl = self.calcular_Nl(perfil_spt, estaca.cota_assentamento)
+        Rl = 0
+        Rl_parcial = 0
+        for cota in range(2, estaca.cota_assentamento + 1):
+            camada_lateral = perfil_spt.obter_medida(cota)
+            beta = self.coef_beta(camada_lateral.tipo_solo, estaca.tipo)
 
-        Rl = self.calcular_Rl(
-            beta,
-            Nl,
-            estaca.perimetro(),
-            medida_cota_assentamento.profundidade - 1,
-        )
+            Rl_parcial = self.calcular_Rl(
+                beta,
+                Nl,
+                estaca.perimetro(),
+                1,
+            )
+
+            Rl += Rl_parcial
+
+        carga_adm = self.calcular_carga_adm(Rp, Rl)
 
         return {
             'resistencia_ponta': Rp,
             'resistencia_lateral': Rl,
-            'resistencia_lateral_total': Rl,
-            'capacidade_total': Rp + Rl,
+            'capacidade_carga': Rp + Rl,
+            'capacidade_carga_adm': carga_adm,
         }
 
 
