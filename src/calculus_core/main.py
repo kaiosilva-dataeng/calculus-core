@@ -34,7 +34,7 @@ def calcular_capacidade_estaca(
             processo_construcao=processo_construcao,
             formato=formato,
             secao_transversal=secao_transversal,
-            comprimento=i,
+            cota_assentamento=i,
         )
 
         resultado_estaca = metodo_calculo.calcular(perfil_spt, estaca)

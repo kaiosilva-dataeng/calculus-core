@@ -268,7 +268,9 @@ class AokiVelloso(MetodoCalculo):
         """
 
         # Cálculo da Resistência de Ponta (Rp)
-        medida_cota_assentamento = perfil_spt.obter_medida(estaca.comprimento)
+        medida_cota_assentamento = perfil_spt.obter_medida(
+            estaca.cota_assentamento
+        )
         K = self.obter_coeficiente_K(medida_cota_assentamento.tipo_solo)
         f1, f2 = self.obter_fatores_F1_F2(
             self._fatores_f1_f2, estaca.tipo, estaca.secao_transversal
@@ -281,7 +283,7 @@ class AokiVelloso(MetodoCalculo):
         # Cálculo da Resistência Lateral (Rl)
         Rl = 0
         Rl_parcial = 0
-        for cota in range(1, medida_cota_assentamento.profundidade + 1):
+        for cota in range(2, medida_cota_assentamento.profundidade + 1):
             medida_cota = perfil_spt.obter_medida(cota)
 
             K = self.obter_coeficiente_K(medida_cota.tipo_solo)

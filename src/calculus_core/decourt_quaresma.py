@@ -254,7 +254,9 @@ class DecourtQuaresma(MetodoCalculo):
         """
 
         # Cálculo da Resistência de Ponta (Rp)
-        medida_cota_assentamento = perfil_spt.obter_medida(estaca.comprimento)
+        medida_cota_assentamento = perfil_spt.obter_medida(
+            estaca.cota_assentamento
+        )
         Np = self.calcular_Np(
             perfil_spt, medida_cota_assentamento.profundidade
         )
@@ -272,7 +274,10 @@ class DecourtQuaresma(MetodoCalculo):
         beta = self.coef_beta(medida_cota_assentamento.tipo_solo, estaca.tipo)
 
         Rl = self.calcular_Rl(
-            beta, Nl, estaca.perimetro(), medida_cota_assentamento.profundidade
+            beta,
+            Nl,
+            estaca.perimetro(),
+            medida_cota_assentamento.profundidade - 1,
         )
 
         return {

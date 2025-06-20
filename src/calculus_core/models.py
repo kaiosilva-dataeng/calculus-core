@@ -9,7 +9,7 @@ class Estaca:
         processo_construcao,
         formato,
         secao_transversal,
-        comprimento,
+        cota_assentamento,
     ):
         if formato not in ['circular', 'quadrada']:
             raise ValueError(
@@ -19,7 +19,7 @@ class Estaca:
         self.processo_construcao = processo_construcao
         self.formato = formato
         self.secao_transversal = secao_transversal
-        self.comprimento = comprimento
+        self.cota_assentamento = cota_assentamento
 
     def area_ponta(self):
         if self.formato == 'circular':
@@ -36,14 +36,6 @@ class Estaca:
         elif self.formato == 'quadrada':
             largura = self.secao_transversal
             return 4 * largura
-
-    def area_lateral(self):
-        if self.formato == 'circular':
-            raio = self.secao_transversal / 2
-            return math.pi * raio * self.comprimento
-        elif self.formato == 'quadrada':
-            largura = self.secao_transversal
-            return largura * self.comprimento
 
 
 class MedidaSPT:
