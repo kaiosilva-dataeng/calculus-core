@@ -95,7 +95,7 @@ class Teixeira(MetodoCalculo):
 
     @staticmethod
     def calcular_Np(perfil_spt: PerfilSPT, cota_assentamento, diametro):
-        intervalo_inicio = math.floor(cota_assentamento - 4 * diametro)
+        intervalo_inicio = math.ceil(cota_assentamento - 4 * diametro)
         intervalo_fim = math.ceil(cota_assentamento + 1 * diametro)
 
         N_spts = [
