@@ -110,7 +110,7 @@ class DecourtQuaresma(MetodoCalculo):
         ) / 3
 
     @staticmethod
-    def calcular_Nl(perfil_spt: PerfilSPT, cota_assentamento: int):
+    def calcular_Nl(perfil_spt: PerfilSPT, estaca: Estaca):
         """
         Calcula o Nl_SPT médio ao longo do fuste da estaca,
         desconsiderando as cotas utilizadas no Np.
@@ -122,16 +122,29 @@ class DecourtQuaresma(MetodoCalculo):
         Returns:
             float: N_SPT médio ao longo do fuste da estaca.
         """
-
+        NSPT_MINIMO = 3
+        NSPT_MAXIMO = 50
+        NSPT_MAXIMO_ESCAVADA = 15
         Nl = 0
         n = 0
-        cota_acima = cota_assentamento
 
-        if cota_acima not in perfil_spt:
-            return 0
+        for i in range(2, estaca.cota_assentamento):
+            spt_camada_lateral = perfil_spt.obter_medida(i).N_SPT
 
-        for i in range(2, cota_acima):
-            Nl += perfil_spt.obter_medida(i).N_SPT
+            if spt_camada_lateral < NSPT_MINIMO:
+                spt_camada_lateral = NSPT_MINIMO
+            elif spt_camada_lateral > NSPT_MAXIMO and (
+                estaca.tipo == 'escavada_bentonita'
+                or estaca.processo_construcao == 'deslocamento'
+            ):
+                spt_camada_lateral = NSPT_MAXIMO
+            elif (
+                spt_camada_lateral > NSPT_MAXIMO_ESCAVADA
+                and estaca.processo_construcao == 'escavada'
+            ):
+                spt_camada_lateral = NSPT_MAXIMO_ESCAVADA
+
+            Nl += spt_camada_lateral
             n += 1
         return Nl / n if n > 0 else 0
 
@@ -280,7 +293,7 @@ class DecourtQuaresma(MetodoCalculo):
         Rp = self.calcular_Rp(alfa, Np, K, estaca.area_ponta())
 
         # Cálculo da Resistência Lateral (Rl)
-        Nl = self.calcular_Nl(perfil_spt, estaca.cota_assentamento)
+        Nl = self.calcular_Nl(perfil_spt, estaca)
         Rl = 0
         Rl_parcial = 0
         for cota in range(2, estaca.cota_assentamento + 1):
