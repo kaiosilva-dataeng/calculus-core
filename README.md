@@ -1,0 +1,68 @@
+# CALCULUS-CORE
+
+Este projeto tem como objetivo ser um pacote python para cálculo de capacidade de carga em fundações profundas por meio da interação solo - estaca utilizandos os métodos semiempiricos de Aoki e Velloso (1975), Aoki e Velloso módificado por Laprovitera (1988), Décourt e Quaresma (1978) e Teixeira (1996).
+
+em src/calculus_core contém as seguintes implementações:
+
+- aoki_velloso.py: Implementação do método de cálculo de estacas de Aoki e Velloso (1975).
+- decourt_quaresma.py: Implementação do método de cálculo de estacas de Decourt e Quaresma (1978).
+- teixeira.py: Implementação do método de cálculo de estacas de Teixeira (1996).
+- models.py: Definição dos modelos utilizados nos cálculos.
+- utils.py: Funções utilitárias para normalização de tipos de estacas e solo.
+- main.py: Função de cálculo de capacidade de carga metro a metro.
+
+# Instalação
+
+1. Utilizando o uv:
+
+```sh
+uv add https://github.com/kaiosilva-dataeng/calculus-core.git
+```
+
+# Como Usar
+- Cálculo usando Aoki e Velloso (1975):
+```python
+# Faça a importação do objeto referente ao método de cálculo desejado
+from calculus_core.aoki_velloso import aoki_velloso_1975
+# Importe os models de Estaca e PerfilSPT
+from calculus_core.models import Estaca, PerfilSPT
+
+# Crie uma instancia do perfil SPT e adicione as camadas de solo.
+perfil_spt = PerfilSPT()
+perfil_spt.adicionar_medidas(
+    [
+        (1, 3, 'areia_argilosa'),
+        (2, 3, 'areia_argilosa'),
+        (3, 5, 'areia_argilosa'),
+        (4, 6, 'argila_arenosa'),
+        (5, 8, 'argila_arenosa'),
+        (6, 13, 'argila_arenosa'),
+        (7, 17, 'argila_arenosa'),
+        (8, 25, 'argila_arenosa'),
+        (9, 27, 'argila_areno_siltosa'),
+        (10, 32, 'argila_areno_siltosa'),
+        (11, 36, 'argila_areno_siltosa'),
+    ]
+)
+
+# Crie uma instancia da estaca
+estaca = Estaca(
+    tipo='pré-moldada',
+    processo_construcao='deslocamento',
+    formato='quadrada',
+    secao_transversal=0.3,
+    cota_assentamento=10,
+)
+
+# Execute o cálculo
+resultado = aoki_velloso_1975.calcular(perfil_spt, estaca)
+print(resultado)
+```
+
+Veja mais exemplos em [Notebooks](notebooks).
+
+# Licença
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+# Créditos
+Este projeto foi desenvolvido por Kaio Silva.
