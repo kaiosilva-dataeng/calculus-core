@@ -1,4 +1,4 @@
-def normalizar_tipo_solo(  # noqa: PLR0911
+def normalizar_tipo_solo(  # noqa
     tipo_solo: str, metodo: str, tabela: str | None = None
 ) -> str:
     """
@@ -64,6 +64,24 @@ def normalizar_tipo_solo(  # noqa: PLR0911
             'areia_argilo_siltosa',
         ]:
             return 'areia'
+    if metodo == 'teixeira':
+        if tipo_solo in ['argila_siltosa', 'argila_silto_arenosa']:
+            return 'argila_siltosa'
+        elif tipo_solo in ['silte_argiloso', 'silte_argilo_arenoso']:
+            return 'silte_argiloso'
+        elif tipo_solo in ['argila_arenosa', 'argila_areno_siltosa']:
+            return 'argila_arenosa'
+        elif tipo_solo in ['silte_arenoso', 'silte_areno_argiloso']:
+            return 'silte_arenoso'
+        elif tipo_solo in ['areia_argilosa', 'areia_argilo_siltosa']:
+            return 'areia_argilosa'
+        elif tipo_solo in ['areia_siltosa', 'areia_silto_argilosa']:
+            return 'areia_siltosa'
+        elif tipo_solo == 'areia':
+            return 'areia'
+        elif tipo_solo == 'areia_com_pedregulhos':
+            return 'areia_com_pedregulhos'
+
     return tipo_solo
 
 
