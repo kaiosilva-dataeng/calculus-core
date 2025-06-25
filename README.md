@@ -70,17 +70,17 @@ from calculus_core.models import Estaca, PerfilSPT
 perfil_spt = PerfilSPT()
 perfil_spt.adicionar_medidas(
     [
-        (1, 3, 'areia_argilosa'),
-        (2, 3, 'areia_argilosa'),
-        (3, 5, 'areia_argilosa'),
+        (1, 3, 'argila_arenosa'),
+        (2, 3, 'argila_arenosa'),
+        (3, 5, 'argila_arenosa'),
         (4, 6, 'argila_arenosa'),
         (5, 8, 'argila_arenosa'),
-        (6, 13, 'argila_arenosa'),
-        (7, 17, 'argila_arenosa'),
-        (8, 25, 'argila_arenosa'),
-        (9, 27, 'argila_areno_siltosa'),
-        (10, 32, 'argila_areno_siltosa'),
-        (11, 36, 'argila_areno_siltosa'),
+        (6, 13, 'areia_argilosa'),
+        (7, 17, 'areia_argilosa'),
+        (8, 25, 'areia_argilosa'),
+        (9, 27, 'areia_silto_argilosa'),
+        (10, 32, 'areia_silto_argilosa'),
+        (11, 36, 'areia_silto_argilosa'),
     ]
 )
 
