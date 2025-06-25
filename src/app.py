@@ -65,34 +65,69 @@ with st.sidebar:
     st.subheader('Perfil de Sondagem (SPT)')
     st.write('Insira os dados do ensaio SPT abaixo:')
 
+    solos_validos = {
+        'Argila': 'argila',
+        'Argila Arenosa': 'argila_arenosa',
+        'Argila Areno Siltosa': 'argila_areno_siltosa',
+        'Argila Siltosa': 'argila_siltosa',
+        'Argila Silto Arenosa': 'argila_silto_arenosa',
+        'Silte': 'silte',
+        'Silte Arenoso': 'silte_arenoso',
+        'Silte Areno Argiloso': 'silte_areno_argiloso',
+        'Silte Argiloso': 'silte_argiloso',
+        'Silte Argilo Arenoso': 'silte_argilo_arenoso',
+        'Areia': 'areia',
+        'Areia com Pedregulhos': 'areia_com_pedregulhos',
+        'Areia Siltosa': 'areia_siltosa',
+        'Areia Silto Argilosa': 'areia_silto_argilosa',
+        'Areia Argilosa': 'areia_argilosa',
+        'Areia Argilo Siltosa': 'areia_argilo_siltosa',
+    }
+    lista_solos_validos = list(solos_validos.keys())
+
+    # Exemplo de dados para o perfil SPT
     exemplo_spt = [
-        {'Profundidade (m)': 1, 'N_SPT': 3, 'Tipo de Solo': 'areia_argilosa'},
-        {'Profundidade (m)': 2, 'N_SPT': 3, 'Tipo de Solo': 'areia_argilosa'},
-        {'Profundidade (m)': 3, 'N_SPT': 5, 'Tipo de Solo': 'areia_argilosa'},
-        {'Profundidade (m)': 4, 'N_SPT': 6, 'Tipo de Solo': 'argila_arenosa'},
-        {'Profundidade (m)': 5, 'N_SPT': 8, 'Tipo de Solo': 'argila_arenosa'},
-        {'Profundidade (m)': 6, 'N_SPT': 13, 'Tipo de Solo': 'argila_arenosa'},
-        {'Profundidade (m)': 7, 'N_SPT': 17, 'Tipo de Solo': 'argila_arenosa'},
-        {'Profundidade (m)': 8, 'N_SPT': 25, 'Tipo de Solo': 'argila_arenosa'},
+        {'Profundidade (m)': 1, 'N_SPT': 3, 'Tipo de Solo': 'Argila Arenosa'},
+        {'Profundidade (m)': 2, 'N_SPT': 3, 'Tipo de Solo': 'Argila Arenosa'},
+        {'Profundidade (m)': 3, 'N_SPT': 5, 'Tipo de Solo': 'Argila Arenosa'},
+        {'Profundidade (m)': 4, 'N_SPT': 6, 'Tipo de Solo': 'Argila Arenosa'},
+        {'Profundidade (m)': 5, 'N_SPT': 8, 'Tipo de Solo': 'Argila Arenosa'},
+        {'Profundidade (m)': 6, 'N_SPT': 13, 'Tipo de Solo': 'Areia Argilosa'},
+        {'Profundidade (m)': 7, 'N_SPT': 17, 'Tipo de Solo': 'Areia Argilosa'},
+        {'Profundidade (m)': 8, 'N_SPT': 25, 'Tipo de Solo': 'Areia Argilosa'},
         {
             'Profundidade (m)': 9,
             'N_SPT': 27,
-            'Tipo de Solo': 'argila_areno_siltosa',
+            'Tipo de Solo': 'Areia Silto Argilosa',
         },
         {
             'Profundidade (m)': 10,
             'N_SPT': 32,
-            'Tipo de Solo': 'argila_areno_siltosa',
+            'Tipo de Solo': 'Areia Silto Argilosa',
         },
         {
             'Profundidade (m)': 11,
             'N_SPT': 36,
-            'Tipo de Solo': 'argila_areno_siltosa',
+            'Tipo de Solo': 'Areia com Pedregulhos',
         },
     ]
-
     dados_spt_df = pd.DataFrame(exemplo_spt)
-    spt_editado_df = st.data_editor(dados_spt_df, num_rows='dynamic')
+
+    # 2. EDITOR DE DADOS COM CAIXA DE SELEÇÃO
+    # O `st.data_editor` agora usa uma configuração de coluna específica.
+    spt_editado_df = st.data_editor(
+        dados_spt_df,
+        column_config={
+            'Tipo de Solo': st.column_config.SelectboxColumn(
+                'Tipo de Solo',
+                help='Selecione o tipo de solo para a camada correspondente.',
+                options=lista_solos_validos,
+                required=True,  # Garante que um valor seja sempre selecionado
+            )
+        },
+        num_rows='dynamic',
+        use_container_width=True,
+    )
 
 
 if st.button('Calcular Capacidade de Carga', type='primary'):
@@ -103,7 +138,7 @@ if st.button('Calcular Capacidade de Carga', type='primary'):
                 (
                     row['Profundidade (m)'],
                     row['N_SPT'],
-                    row['Tipo de Solo'],
+                    solos_validos[row['Tipo de Solo']],
                 )
                 for index, row in spt_editado_df.iterrows()
             ]
