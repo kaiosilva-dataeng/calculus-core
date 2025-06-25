@@ -99,7 +99,7 @@ class Teixeira(MetodoCalculo):
         intervalo_fim = math.ceil(cota_assentamento + 1 * diametro)
 
         N_spts = [
-            perfil_spt.obter_medida(i).N_SPT
+            perfil_spt.obter_medida(i, aprox=True).N_SPT
             for i in range(intervalo_inicio, intervalo_fim + 1)
         ]
 
