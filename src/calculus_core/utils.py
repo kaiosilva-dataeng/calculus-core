@@ -81,6 +81,9 @@ def normalizar_tipo_solo(  # noqa
             return 'areia'
         elif tipo_solo == 'areia_com_pedregulhos':
             return 'areia_com_pedregulhos'
+    if metodo == 'aoki_velloso':
+        if tipo_solo == 'areia_com_pedregulhos':
+            return 'areia'
 
     return tipo_solo
 
