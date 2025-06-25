@@ -11,16 +11,55 @@ em src/calculus_core contém as seguintes implementações:
 - utils.py: Funções utilitárias para normalização de tipos de estacas e solo.
 - main.py: Função de cálculo de capacidade de carga metro a metro.
 
-# Instalação
+## Instalação
 
-1. Utilizando o uv:
+### Pré-requisito
+
+- Python 3.13
+- Astral uv
+
+Ao utilizar astral uv, você ganhar automaticamente um gerenciador de versões da linguaguem python.
+
+Windows
+
+Abra o terminal PowerShell e execute o código abaixo.
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+macOS e Linux
+
+```sh
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Instalando o pacote
+
+1. Inicie um projeto
+
+```sh
+uv init <nome-do-seu-projeto>
+```
+
+2. Acesse a pasta do projeto
+
+```
+cd <nome-do-seu-projeto>
+```
+
+3. Instale o pacote com uv:
 
 ```sh
 uv add https://github.com/kaiosilva-dataeng/calculus-core.git
 ```
 
-# Como Usar
-- Cálculo usando Aoki e Velloso (1975):
+## Como Usar
+
+Cálculo usando Aoki e Velloso (1975):
+
+Crie um arquivo python e copie e cole o código de exemplo abaixo:
+
 ```python
 # Faça a importação do objeto referente ao método de cálculo desejado
 from calculus_core.aoki_velloso import aoki_velloso_1975
@@ -62,7 +101,9 @@ print(resultado)
 Veja mais exemplos em [Notebooks](notebooks).
 
 # Licença
+
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 # Créditos
-Este projeto foi desenvolvido por Kaio Silva.
+
+Este projeto foi desenvolvido por Kaio Henrique Pires da Silva.
