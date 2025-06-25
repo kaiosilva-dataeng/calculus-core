@@ -4,7 +4,7 @@ from calculus_core.utils import normalizar_tipo_estaca, normalizar_tipo_solo
 coeficientes_aoki_velloso_1975 = {
     'areia': {'k_kpa': 1000, 'alpha_perc': 1.4},
     'areia_siltosa': {'k_kpa': 800, 'alpha_perc': 2.0},
-    'areia_silto_argilosa': {'k_kpa': 0.70, 'alpha_perc': 2.4},
+    'areia_silto_argilosa': {'k_kpa': 700, 'alpha_perc': 2.4},
     'areia_argilosa': {'k_kpa': 600, 'alpha_perc': 3.0},
     'areia_argilo_siltosa': {'k_kpa': 500, 'alpha_perc': 2.8},
     'silte': {'k_kpa': 400, 'alpha_perc': 3.0},
@@ -133,9 +133,8 @@ class AokiVelloso(MetodoCalculo):
         self._coeficientes_aoki_velloso = coeficientes_aoki_velloso
         self._fatores_f1_f2 = fatores_f1_f2
 
-    @staticmethod
     def obter_fatores_F1_F2(
-        fatores_f1_f2: dict,
+        self,
         tipo_estaca: str,
         diametro_estaca: float | None = None,
     ):
@@ -144,12 +143,12 @@ class AokiVelloso(MetodoCalculo):
         """
         tipo_estaca = normalizar_tipo_estaca(tipo_estaca, 'aoki_velloso')
 
-        if tipo_estaca not in fatores_f1_f2:
+        if tipo_estaca not in self._fatores_f1_f2:
             raise ValueError(
                 f"Tipo de estaca '{tipo_estaca}' não reconhecido."
             )
 
-        dados_fator = fatores_f1_f2[tipo_estaca]
+        dados_fator = self._fatores_f1_f2[tipo_estaca]
         valor_f1 = dados_fator['F1']
         func_f2 = dados_fator['F2']
 
@@ -221,15 +220,14 @@ class AokiVelloso(MetodoCalculo):
     @staticmethod
     def calcular_Np(perfil_spt: PerfilSPT, cota_assentamento: int):
         """
-            Calcula o Np_SPT médio na cota especificada,
-            considerando a média do metro acima e abaixo.
+            Encontra o N_SPT na camada de apoio da ponta.
 
         Args:
             perfil_spt: Lista de tuplas (N_SPT, tipo_solo).
             cota: Cota para calcular o N_SPT médio.
 
         Returns:
-            float: N_SPT médio na cota especificada.
+            float: N_SPT na cota de apoio da ponta.
         """
 
         if cota_assentamento not in perfil_spt:
@@ -317,7 +315,7 @@ class AokiVelloso(MetodoCalculo):
         )
         K = self.obter_coeficiente_K(camada_apoio_ponta.tipo_solo)
         f1, f2 = self.obter_fatores_F1_F2(
-            self._fatores_f1_f2, estaca.tipo, estaca.secao_transversal
+            estaca.tipo, estaca.secao_transversal
         )
 
         Rp = self.calcular_Rp(K, Np, f1, estaca.area_ponta())
