@@ -1,6 +1,7 @@
 from calculus_core.aoki_velloso import AokiVelloso
 from calculus_core.decourt_quaresma import DecourtQuaresma
 from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
+from calculus_core.teixeira import Teixeira
 
 
 def calcular_capacidade_estaca(
@@ -35,6 +36,13 @@ def calcular_capacidade_estaca(
         cota_parada = len(perfil_spt) - 1
     elif isinstance(metodo_calculo, DecourtQuaresma):
         cota_parada = len(perfil_spt) - 2
+    elif isinstance(metodo_calculo, Teixeira):
+        cota_parada = len(perfil_spt) - 1
+    else:
+        raise ValueError(
+            'Método de cálculo não suportado. '
+            'Use AokiVelloso, DecourtQuaresma ou Teixeira.'
+        )
 
     for i in range(1, cota_parada + 1):
         estaca = Estaca(
