@@ -30,6 +30,7 @@ def normalizar_tipo_solo(  # noqa
             return 'silte'
         elif tipo_solo in [
             'areia',
+            'areia_com_pedregulhos',
             'areia_siltosa',
             'areia_silto_argilosa',
             'areia_argilosa',
@@ -58,12 +59,14 @@ def normalizar_tipo_solo(  # noqa
             return 'silte_argiloso'
         elif tipo_solo in [
             'areia',
+            'areia_com_pedregulhos',
             'areia_siltosa',
             'areia_silto_argilosa',
             'areia_argilosa',
             'areia_argilo_siltosa',
         ]:
             return 'areia'
+
     if metodo == 'teixeira':
         if tipo_solo in ['argila_siltosa', 'argila_silto_arenosa']:
             return 'argila_siltosa'
@@ -81,6 +84,7 @@ def normalizar_tipo_solo(  # noqa
             return 'areia'
         elif tipo_solo == 'areia_com_pedregulhos':
             return 'areia_com_pedregulhos'
+
     if metodo == 'aoki_velloso':
         if tipo_solo == 'areia_com_pedregulhos':
             return 'areia'
