@@ -1,5 +1,5 @@
-from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
-from calculus_core.utils import normalizar_tipo_estaca, normalizar_tipo_solo
+from .models import Estaca, MetodoCalculo, PerfilSPT
+from .utils import normalizar_tipo_estaca, normalizar_tipo_solo
 
 coef_K_decourt_quaresma_1978 = {
     'argila': {'deslocamento': 120, 'escavada': 100},

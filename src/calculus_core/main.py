@@ -1,7 +1,7 @@
-from calculus_core.aoki_velloso import AokiVelloso
-from calculus_core.decourt_quaresma import DecourtQuaresma
-from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
-from calculus_core.teixeira import Teixeira
+from .aoki_velloso import AokiVelloso
+from .decourt_quaresma import DecourtQuaresma
+from .models import Estaca, MetodoCalculo, PerfilSPT
+from .teixeira import Teixeira
 
 
 def calcular_capacidade_estaca(

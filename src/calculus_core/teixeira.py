@@ -1,7 +1,7 @@
 import math
 
-from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
-from calculus_core.utils import normalizar_tipo_estaca, normalizar_tipo_solo
+from .models import Estaca, MetodoCalculo, PerfilSPT
+from .utils import normalizar_tipo_estaca, normalizar_tipo_solo
 
 coeficientes_alpha_teixeira_1996 = {
     'argila_siltosa': {

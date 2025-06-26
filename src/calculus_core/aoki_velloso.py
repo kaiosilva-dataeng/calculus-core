@@ -1,5 +1,5 @@
-from calculus_core.models import Estaca, MetodoCalculo, PerfilSPT
-from calculus_core.utils import normalizar_tipo_estaca, normalizar_tipo_solo
+from .models import Estaca, MetodoCalculo, PerfilSPT
+from .utils import normalizar_tipo_estaca, normalizar_tipo_solo
 
 coeficientes_aoki_velloso_1975 = {
     'areia': {'k_kpa': 1000, 'alpha_perc': 1.4},
