@@ -24,7 +24,7 @@ include = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/calculus_core"]
+packages = ["src/"]
 
 [build-system]
 requires = ["hatchling"]
