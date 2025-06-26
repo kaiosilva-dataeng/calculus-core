@@ -14,17 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-calculus-app = "cli:run_app"
-
-[tool.hatch.build]
-include = [
-    "src/calculus_core/*",
-    "src/cli.py",
-    "src/app.py",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/"]
+calculus-app = "calculus_core.cli:run_app"
 
 [build-system]
 requires = ["hatchling"]
