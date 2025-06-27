@@ -1,4 +1,47 @@
-def normalizar_tipo_solo(  # noqa
+mapeamento_decourt_quaresma = {
+    'argila': [
+        'argila',
+        'argila_arenosa',
+        'argila_areno_siltosa',
+        'argila_siltosa',
+        'argila_silto_arenosa',
+    ],
+    'silte': [
+        'silte',
+        'silte_arenoso',
+        'silte_areno_argiloso',
+        'silte_argiloso',
+        'silte_argilo_arenoso',
+    ],
+    'areia': [
+        'areia',
+        'areia_com_pedregulhos',
+        'areia_siltosa',
+        'areia_silto_argilosa',
+        'areia_argilosa',
+        'areia_argilo_siltosa',
+    ],
+}
+
+mapeamento_teixeira = {
+    'argila_siltosa': ['argila_siltosa', 'argila_silto_arenosa'],
+    'silte_argiloso': ['silte_argiloso', 'silte_argilo_arenoso'],
+    'argila_arenosa': ['argila_arenosa', 'argila_areno_siltosa'],
+    'silte_arenoso': ['silte_arenoso', 'silte_areno_argiloso'],
+    'areia_argilosa': ['areia_argilosa', 'areia_argilo_siltosa'],
+    'areia_siltosa': ['areia_siltosa', 'areia_silto_argilosa'],
+}
+
+mapeamento_aoki_velloso = {'areia': ['areia', 'areia_com_pedregulhos']}
+
+mapeamento_metodos = {
+    'décourt_quaresma': mapeamento_decourt_quaresma,
+    'teixeira': mapeamento_teixeira,
+    'aoki_velloso': mapeamento_aoki_velloso,
+}
+
+
+def normalizar_tipo_solo(
     tipo_solo: str, metodo: str, tabela: str | None = None
 ) -> str:
     """
@@ -10,86 +53,20 @@ def normalizar_tipo_solo(  # noqa
     Returns:
         str: Tipo de solo normalizado.
     """
-    tipo_solo = tipo_solo.lower().replace(' ', '_').replace('-', '_')
-    if metodo == 'décourt_quaresma' and tabela == 'alfa' or tabela == 'beta':
-        if tipo_solo in [
-            'argila',
-            'argila_arenosa',
-            'argila_areno_siltosa',
-            'argila_siltosa',
-            'argila_silto_arenosa',
-        ]:
-            return 'argila'
-        elif tipo_solo in [
-            'silte',
-            'silte_arenoso',
-            'silte_areno_argiloso',
-            'silte_argiloso',
-            'silte_argilo_arenoso',
-        ]:
-            return 'silte'
-        elif tipo_solo in [
-            'areia',
-            'areia_com_pedregulhos',
-            'areia_siltosa',
-            'areia_silto_argilosa',
-            'areia_argilosa',
-            'areia_argilo_siltosa',
-        ]:
-            return 'areia'
+    tipo_solo_norm = tipo_solo.lower().replace(' ', '_').replace('-', '_')
+
+    mapeamento_solo = mapeamento_metodos.get(metodo, {})
+
     if metodo == 'décourt_quaresma' and tabela == 'K':
-        if tipo_solo in [
-            'argila',
-            'argila_arenosa',
-            'argila_areno_siltosa',
-            'argila_siltosa',
-            'argila_silto_arenosa',
-        ]:
-            return 'argila'
-        elif tipo_solo in [
-            'silte',
-            'silte_arenoso',
-            'silte_areno_argiloso',
-        ]:
+        if tipo_solo_norm == 'silte':
             return 'silte_arenoso'
-        elif tipo_solo in [
-            'silte_argiloso',
-            'silte_argilo_arenoso',
-        ]:
-            return 'silte_argiloso'
-        elif tipo_solo in [
-            'areia',
-            'areia_com_pedregulhos',
-            'areia_siltosa',
-            'areia_silto_argilosa',
-            'areia_argilosa',
-            'areia_argilo_siltosa',
-        ]:
-            return 'areia'
 
-    if metodo == 'teixeira':
-        if tipo_solo in ['argila_siltosa', 'argila_silto_arenosa']:
-            return 'argila_siltosa'
-        elif tipo_solo in ['silte_argiloso', 'silte_argilo_arenoso']:
-            return 'silte_argiloso'
-        elif tipo_solo in ['argila_arenosa', 'argila_areno_siltosa']:
-            return 'argila_arenosa'
-        elif tipo_solo in ['silte_arenoso', 'silte_areno_argiloso']:
-            return 'silte_arenoso'
-        elif tipo_solo in ['areia_argilosa', 'areia_argilo_siltosa']:
-            return 'areia_argilosa'
-        elif tipo_solo in ['areia_siltosa', 'areia_silto_argilosa']:
-            return 'areia_siltosa'
-        elif tipo_solo == 'areia':
-            return 'areia'
-        elif tipo_solo == 'areia_com_pedregulhos':
-            return 'areia_com_pedregulhos'
+    if mapeamento_solo:
+        for grupo, solos in mapeamento_solo.items():
+            if tipo_solo_norm in solos:
+                return grupo
 
-    if metodo == 'aoki_velloso':
-        if tipo_solo == 'areia_com_pedregulhos':
-            return 'areia'
-
-    return tipo_solo
+    return tipo_solo_norm
 
 
 def normalizar_tipo_estaca(tipo_estaca: str, metodo: str) -> str:
@@ -102,9 +79,9 @@ def normalizar_tipo_estaca(tipo_estaca: str, metodo: str) -> str:
     Returns:
         str: Tipo de estaca normalizado.
     """
-    tipo_estaca = tipo_estaca.lower().replace(' ', '_').replace('-', '_')
+    tipo_estaca_norm = tipo_estaca.lower().replace(' ', '_').replace('-', '_')
     if metodo == 'décourt_quaresma':
-        if tipo_estaca in [
+        if tipo_estaca_norm in [
             'cravada',
             'franki',
             'pré_moldada',
@@ -112,12 +89,12 @@ def normalizar_tipo_estaca(tipo_estaca: str, metodo: str) -> str:
             'ômega',
         ]:
             return 'cravada'
-        elif tipo_estaca in [
+        elif tipo_estaca_norm in [
             'escavada',
             'escavada_bentonita',
             'hélice_contínua',
             'raiz',
             'injetada',
         ]:
-            return tipo_estaca
-    return tipo_estaca
+            return tipo_estaca_norm
+    return tipo_estaca_norm
