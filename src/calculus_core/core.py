@@ -1,11 +1,11 @@
 from .aoki_velloso import AokiVelloso
 from .decourt_quaresma import DecourtQuaresma
-from .models import Estaca, MetodoCalculo, PerfilSPT
+from .models import Estaca, PerfilSPT
 from .teixeira import Teixeira
 
 
 def calcular_capacidade_estaca(
-    metodo_calculo: MetodoCalculo,
+    metodo_calculo: AokiVelloso | Teixeira | DecourtQuaresma,
     perfil_spt: PerfilSPT,
     tipo_estaca: str,
     processo_construcao: str,
@@ -17,7 +17,8 @@ def calcular_capacidade_estaca(
     usando o método especificado.
 
     Args:
-        metodo_calculo (callable): Método de cálculo a ser utilizado.
+        metodo_calculo (AokiVelloso | Teixeira | DecourtQuaresma):
+            Método de cálculo a ser utilizado.
         perfil_spt: Perfil SPT da estaca.
         tipo_estaca: Tipo de estaca (cravada, franki, pré_moldada, metálica,
             ômega, escavada, escavada_bentonita, hélice_contínua, raiz,
@@ -31,19 +32,7 @@ def calcular_capacidade_estaca(
     """
 
     resultado: list[dict] = []
-
-    if isinstance(metodo_calculo, AokiVelloso):
-        cota_parada = len(perfil_spt) - 1
-    elif isinstance(metodo_calculo, DecourtQuaresma):
-        cota_parada = len(perfil_spt) - 2
-    elif isinstance(metodo_calculo, Teixeira):
-        cota_parada = len(perfil_spt) - 1
-    else:
-        raise ValueError(
-            'Método de cálculo não suportado. '
-            'Use AokiVelloso, DecourtQuaresma ou Teixeira.'
-        )
-
+    cota_parada = metodo_calculo.cota_parada(perfil_spt)
     for i in range(1, cota_parada + 1):
         estaca = Estaca(
             tipo=tipo_estaca,
