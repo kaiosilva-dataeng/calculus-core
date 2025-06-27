@@ -81,9 +81,17 @@ class Teixeira(MetodoCalculo):
         tipo_estaca = normalizar_tipo_estaca(tipo_estaca, 'teixeira')
 
         if tipo_solo not in self._coeficientes_alpha:
-            raise ValueError(f'Tipo de solo inválido: {tipo_solo}')
+            raise ValueError(
+                (
+                    f'Tipo de solo não suportado '
+                    f'pelo método de Teixeira: {tipo_solo}'
+                )
+            )
         if tipo_estaca not in self._coeficientes_alpha[tipo_solo]:
-            raise ValueError(f'Tipo de estaca inválido: {tipo_estaca}')
+            raise ValueError(
+                f'Tipo de estaca não suportado '
+                f'pelo método de Teixeira: {tipo_estaca}'
+            )
         return self._coeficientes_alpha[tipo_solo][tipo_estaca]
 
     def coef_beta(self, tipo_estaca):
@@ -165,6 +173,15 @@ class Teixeira(MetodoCalculo):
             'capacidade_carga': Rp + Rl,
             'capacidade_carga_adm': carga_adm,
         }
+
+    @staticmethod
+    def cota_parada(perfil_spt: PerfilSPT) -> int:
+        """
+        Retorna a cota de parada para o cálculo da estaca.
+        Para Teixeira, a cota de parada é a penúltima camada do
+        perfil SPT.
+        """
+        return len(perfil_spt) - 1
 
 
 teixeira_1996 = Teixeira(

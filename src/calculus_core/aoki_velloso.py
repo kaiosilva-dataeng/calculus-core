@@ -145,7 +145,8 @@ class AokiVelloso(MetodoCalculo):
 
         if tipo_estaca not in self._fatores_f1_f2:
             raise ValueError(
-                f"Tipo de estaca '{tipo_estaca}' não reconhecido."
+                f'Tipo de estaca não suportado '
+                f'pelo método de Aoki e Velloso: {tipo_estaca}'
             )
 
         dados_fator = self._fatores_f1_f2[tipo_estaca]
@@ -186,7 +187,10 @@ class AokiVelloso(MetodoCalculo):
         tipo_solo = normalizar_tipo_solo(tipo_solo, 'aoki_velloso')
 
         if tipo_solo not in self._coeficientes_aoki_velloso:
-            raise ValueError(f"Tipo de solo '{tipo_solo}' não reconhecido.")
+            raise ValueError(
+                f'Tipo de solo não suportado '
+                f'pelo método de Aoki e Velloso: {tipo_solo}'
+            )
         return self._coeficientes_aoki_velloso[tipo_solo]['k_kpa']
 
     def obter_coeficiente_alfa(
@@ -206,7 +210,10 @@ class AokiVelloso(MetodoCalculo):
         tipo_solo = normalizar_tipo_solo(tipo_solo, 'aoki_velloso')
 
         if tipo_solo not in self._coeficientes_aoki_velloso:
-            raise ValueError(f"Tipo de solo '{tipo_solo}' não reconhecido.")
+            raise ValueError(
+                f'Tipo de solo não suportado '
+                f'pelo método de Aoki e Velloso: {tipo_solo}'
+            )
         if (
             not perfil_spt.confiavel
             and 'alpha_star_perc' in self._coeficientes_aoki_velloso[tipo_solo]
@@ -348,6 +355,14 @@ class AokiVelloso(MetodoCalculo):
             'capacidade_carga': Rp + Rl,
             'capacidade_carga_adm': carga_adm,
         }
+
+    @staticmethod
+    def cota_parada(perfil_spt: PerfilSPT) -> int:
+        """
+        Retorna a cota de parada para o cálculo da estaca.
+        Para Aoki e Velloso, a cota de parada é a última camada do perfil SPT.
+        """
+        return len(perfil_spt) - 1
 
 
 aoki_velloso_1975 = AokiVelloso(

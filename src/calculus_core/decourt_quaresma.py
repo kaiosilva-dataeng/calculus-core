@@ -196,7 +196,12 @@ class DecourtQuaresma(MetodoCalculo):
         tipo_solo = normalizar_tipo_solo(tipo_solo, 'décourt_quaresma', 'K')
 
         if tipo_solo not in self._coef_K:
-            raise ValueError(f'Tipo de solo inválido: {tipo_solo}')
+            raise ValueError(
+                (
+                    f'Tipo de solo não suportado '
+                    f'pelo método de Décourt e Quaresma: {tipo_solo}'
+                )
+            )
         if processo_construcao not in self._coef_K[tipo_solo]:
             raise ValueError(
                 f'Processo de construção inválido: {processo_construcao}'
@@ -317,6 +322,15 @@ class DecourtQuaresma(MetodoCalculo):
             'capacidade_carga': Rp + Rl,
             'capacidade_carga_adm': carga_adm,
         }
+
+    @staticmethod
+    def cota_parada(perfil_spt: PerfilSPT) -> int:
+        """
+        Retorna a cota de parada para o cálculo da estaca.
+        Para Décourt e Quaresma, a cota de parada é a penúltima camada do
+        perfil SPT.
+        """
+        return len(perfil_spt) - 2
 
 
 decort_quaresma_1978_revisado = DecourtQuaresma(
