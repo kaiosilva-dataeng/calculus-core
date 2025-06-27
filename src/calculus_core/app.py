@@ -6,8 +6,8 @@ from calculus_core.aoki_velloso import (
     aoki_velloso_1975,
     aoki_velloso_1975_laprovitera_1988,
 )
+from calculus_core.core import calcular_capacidade_estaca
 from calculus_core.decourt_quaresma import decort_quaresma_1978_revisado
-from calculus_core.main import calcular_capacidade_estaca
 from calculus_core.models import PerfilSPT
 from calculus_core.teixeira import teixeira_1996
 
