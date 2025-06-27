@@ -21,7 +21,7 @@ st.title('🏗️ Proposta de interface para Calculus-Core')
 st.write(
     (
         'Esta aplicação permite calcular a capacidade de carga de estacas '
-        'utilizando os métodos do pacote `calculus-core`.'
+        'utilizando os métodos de cálculo incluido pacote `calculus-core`.'
     )
 )
 
@@ -207,9 +207,14 @@ if st.button('Calcular Capacidade de Carga', type='primary'):
 
 # --- Rodapé ---
 st.markdown('---')
-st.write(
+st.markdown(
     (
-        'Desenvolvido como um parceiro de programação para o projeto '
-        '`calculus-core`.'
+        'Desenvolvido como projeto de conclusão de curso de Engenharia Civil '
+        'pelo IFTO - Campus Palmas. '
+        'Por [Kaio Henrique Pires da Silva](https://www.linkedin.com/in/kaiosilva-dataeng/).'
     )
+)
+st.markdown(
+    'Para mais informações, visite o '
+    '[repositório](https://github.com/kaiosilva-dataeng/calculus-core).'
 )
