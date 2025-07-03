@@ -37,8 +37,11 @@ with st.sidebar:
         'Teixeira (1996)': teixeira_1996,
     }
 
-    metodo_selecionado = st.selectbox(
-        'Selecione o Método de Cálculo', list(metodos.keys())
+    metodo_selecionado = st.multiselect(
+        'Selecione os Métodos de Cálculo',
+        placeholder='Selecione ao menos um método',
+        options=list(metodos.keys()),
+        default=list(metodos.keys())[:4],
     )
 
     st.subheader('Dados da Estaca')
@@ -46,7 +49,6 @@ with st.sidebar:
         'Tipo de Estaca',
         [
             'Pré-moldada',
-            'Metálica',
             'Franki',
             'Escavada',
             'Raiz',
@@ -144,22 +146,28 @@ if st.button('Calcular Capacidade de Carga', type='primary'):
             ]
             perfil_spt.adicionar_medidas(dados_spt_list)
 
-            metodo_calculo = metodos[metodo_selecionado]
+            resultados_gerais = []
+            for metodo in metodo_selecionado:
+                metodo_calculo = metodos[metodo]
 
-            resultado = calcular_capacidade_estaca(
-                metodo_calculo=metodo_calculo,
-                perfil_spt=perfil_spt,
-                tipo_estaca=tipo_estaca.lower().replace(' ', '_'),
-                processo_construcao=processo_construcao.lower(),
-                formato=formato.lower(),
-                secao_transversal=secao_transversal,
-            )
+                resultado = calcular_capacidade_estaca(
+                    metodo_calculo=metodo_calculo,
+                    perfil_spt=perfil_spt,
+                    tipo_estaca=tipo_estaca.lower().replace(' ', '_'),
+                    processo_construcao=processo_construcao.lower(),
+                    formato=formato.lower(),
+                    secao_transversal=secao_transversal,
+                )
 
-            if resultado:
+                if resultado:
+                    resultado_df = pd.DataFrame(resultado)
+                    resultado_df['Método'] = metodo
+                    resultados_gerais.append(resultado_df)
+
+            if resultados_gerais:
                 st.success('Cálculo concluído com sucesso!')
-                resultado_df = pd.DataFrame(resultado)
-
-                resultado_df.rename(
+                metodos_df = pd.concat(resultados_gerais, ignore_index=True)
+                metodos_df.rename(
                     columns={
                         'cota': 'Cota (m)',
                         'resistencia_ponta': 'Resistência de Ponta (kN)',
@@ -170,28 +178,58 @@ if st.button('Calcular Capacidade de Carga', type='primary'):
                     inplace=True,
                 )
 
-                st.subheader('Resultados do Cálculo')
+                st.subheader('Resultados dos Cálculos')
+
+                metodos_df_pivotado = metodos_df.pivot(
+                    index='Cota (m)',
+                    columns='Método',
+                )
                 st.dataframe(
-                    resultado_df, height=350, use_container_width=True
+                    metodos_df_pivotado.style.format('{:.2f}', na_rep='-'),
+                    height=350,
+                    use_container_width=True,
                 )
 
-                st.subheader('Gráfico da Capacidade de Carga Admissível')
+                st.subheader(
+                    'Gráfico Comparativo da Capacidade de Carga Admissível'
+                )
+
+                min_prof = perfil_spt[0].profundidade
+                max_prof = perfil_spt[-1].profundidade
+                ticks_profundidade = list(range(min_prof, max_prof + 1))
+
                 chart = (
-                    alt.Chart(resultado_df)
+                    alt.Chart(metodos_df)
                     .mark_line(point=True, tooltip=True)
                     .encode(
                         x=alt.X(
                             'Cota (m):Q',
-                            axis=alt.Axis(title='Profundidade (m)'),
+                            axis=alt.Axis(
+                                title='Profundidade (m)',
+                                values=ticks_profundidade,
+                            ),
                         ),
                         y=alt.Y(
                             'Carga Admissível (kN):Q',
                             axis=alt.Axis(title='Carga Admissível (kN)'),
                         ),
+                        color='Método:N',
+                        tooltip=[
+                            'Cota (m)',
+                            'Carga Admissível (kN)',
+                            'Método',
+                        ],
                     )
                     .interactive()
                 )
                 st.altair_chart(chart, use_container_width=True)
+
+                with st.expander('Ver Tabela de Dados Completos'):
+                    st.dataframe(
+                        metodos_df,
+                        height=350,
+                        use_container_width=True,
+                    )
             else:
                 st.warning(
                     (
