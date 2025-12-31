@@ -43,3 +43,12 @@ All commits must follow the **Conventional Commits** specification (v1.0.0):
 *   `fix(frontend): adjust depth selector value clamping`
 *   `refactor(domain): improve Aoki-Velloso method modularity`
 *   `chore(ci): update coverage badge path`
+
+## Documentation Maintenance
+
+AI agents must ensure that any architectural changes are reflected in the project documentation:
+
+*   **Accuracy**: Review `docs/architecture.md` to ensure it accurately reflects the current codebase structure after any refactor or new feature.
+*   **Mermaid Diagrams**: Verify that Mermaid diagrams are correctly formatted and represent the active architecture layers.
+*   **File Paths**: Check that all file links and paths mentioned in the documentation exist and are correct.
+*   **Guarantee README accuracy**: Run `uv run pytest tests/test_readme_examples.py` after any API changes to ensure code examples remain functional.
