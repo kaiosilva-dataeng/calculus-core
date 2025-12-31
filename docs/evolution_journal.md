@@ -53,6 +53,7 @@ Para garantir a sustentabilidade do projeto, implementamos ferramentas de govern
 As atualizações mais recentes focaram em resolver as limitações de "vida real" sentidas pelos usuários.
 
 ### 📈 Evolução Técnica e Funcional
+- **Release Automático via OIDC**: Implementação de um fluxo de trabalho robusto que publica automaticamente no PyPI e no GitHub Releases ao detectar uma nova tag de versão (`v*`). Utiliza *Trusted Publishing* via OIDC (OpenID Connect), eliminando a necessidade de gerenciar tokens de API inseguros.
 - **Suporte a Profundidade Ponto-Flutuante**: Refatoração completa para suportar registros de solo em profundidades como `1.5m` ou `2.75m`, removendo a limitação de números inteiros.
 - **Interface Streamlit Premium**: Modernização visual da UI, com melhores gráficos, tabelas dinâmicas e aviso de depreciações corrigidos.
 - **Verificação de Exemplos**: Automação que garante que todos os exemplos apresentados no `README.md` funcionam corretamente com a versão atual do código.
