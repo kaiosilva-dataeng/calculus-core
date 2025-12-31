@@ -1,3 +1,9 @@
+## v0.5.1 (2025-12-31)
+
+### Fix
+
+- improve docstring for ResultadoCalculo class
+
 ## v0.5.0 (2025-12-31)
 
 ### Feat
