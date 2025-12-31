@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  checks: write
+  pull-requests: write
+
+jobs:
+  check:
+    name: Check and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run lint and format checks
+        run: uv run task check
+
+      - name: Run tests with coverage
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p reports
+          uv run pytest --junitxml=reports/junit.xml --cov-report=xml:reports/coverage.xml --cov-report=term-missing:skip-covered --cov=src/calculus_core tests/ | tee reports/pytest-coverage.txt
+
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./reports/pytest-coverage.txt
+          junitxml-path: ./reports/junit.xml
+
+      - name: Generate Coverage Badge
+        if: success() || failure()
+        run: |
+          uv pip install genbadge[coverage]
+          mkdir -p badges
+          uv run genbadge coverage -i reports/coverage.xml -o badges/coverage.svg
+
+      - name: Commit Badge
+        if: success() || failure()
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update coverage badge [skip ci]"
+          file_pattern: badges/coverage.svg
