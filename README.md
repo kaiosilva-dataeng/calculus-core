@@ -1,7 +1,7 @@
 # Calculus-Core
 
 [![CI](https://github.com/kaiosilva-dataeng/calculus-core/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiosilva-dataeng/calculus-core/actions/workflows/ci.yml)
-[![Coverage](badges/coverage.svg)](https://github.com/kaiosilva-dataeng/calculus-core)
+[![Coverage](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/badges/coverage.svg)](https://github.com/kaiosilva-dataeng/calculus-core)
 [![PyPI](https://img.shields.io/pypi/v/calculus-core)](https://pypi.org/project/calculus-core/)
 [![Python](https://img.shields.io/pypi/pyversions/calculus-core)](https://pypi.org/project/calculus-core/)
 
@@ -268,15 +268,15 @@ uv run calculus-app
 Abaixo estão algumas capturas de tela da interface web do **Calculus-Core**:
 
 ### 1. Dashboard e Visão Geral
-![Interface Principal](docs/assets/1-app.png)
+![Interface Principal](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/1-app.png)
 *Visão geral do aplicativo e seleção de módulos.*
 
 ### 2. Gestão de Dados de Solo
-![Dados de Solo](docs/assets/2-dados_solo.png)
+![Dados de Solo](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/2-dados_solo.png)
 *Importação e edição de perfis de sondagem SPT e CPT.*
 
 ### 3. Cálculos de Capacidade de Carga
-![Cálculo Simples](docs/assets/3-calculo_simples.png)
+![Cálculo Simples](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/3-calculo_simples.png)
 *Cálculo detalhado para uma configuração específica de estaca e profundidade.*
 
 ### 4. Análises em Lote (Batch)
@@ -284,7 +284,7 @@ O módulo de lote permite comparações rápidas entre diferentes cenários:
 
 | Métodos | Estacas | Global |
 |:---:|:---:|:---:|
-| ![Métodos](docs/assets/4.1-calculo_lote_metodos.png) | ![Estacas](docs/assets/4.2-calculo_lote_estacas.png) | ![Global](docs/assets/4.3-calculo_lote_global.png) |
+| ![Métodos](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/4.1-calculo_lote_metodos.png) | ![Estacas](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/4.2-calculo_lote_estacas.png) | ![Global](https://raw.githubusercontent.com/kaiosilva-dataeng/calculus-core/main/docs/assets/4.3-calculo_lote_global.png) |
 | *Comparativo de métodos* | *Comparativo de estacas* | *Análise global* |
 
 ## Desenvolvimento
