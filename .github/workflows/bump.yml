@@ -32,8 +32,24 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create bump and changelog
+        id: cz
         uses: commitizen-tools/commitizen-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
           actor: commitizen-bot
+
+      - name: Trigger Release workflow
+        if: steps.cz.outputs.version != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'release.yml',
+              ref: 'main',
+              inputs: {
+                tag: 'v${{ steps.cz.outputs.version }}'
+              }
+            })
