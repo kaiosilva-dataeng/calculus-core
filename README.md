@@ -38,16 +38,16 @@ uv sync --all-extras
 ## Uso Básico
 
 ```python
-from calculus_core import create_aoki_velloso_1975, Estaca, PerfilSPT
+from calculus_core import get_calculator_instance, Estaca, PerfilSPT
 
 # Criar perfil SPT (suporta profundidades fracionárias)
 perfil = PerfilSPT(nome_sondagem='SP-01')
 perfil.adicionar_medidas([
     (1.0, 3, 'argila_arenosa'),
-    (1.5, 4, 'argila_arenosa'),
     (2.0, 6, 'areia_argilosa'),
-    (2.5, 8, 'areia_argilosa'),
     (3.0, 12, 'areia'),
+    (4.0, 15, 'areia'),
+    (5.0, 18, 'areia'),
 ])
 
 # Criar estaca
@@ -60,7 +60,7 @@ estaca = Estaca(
 )
 
 # Calcular
-calculator = create_aoki_velloso_1975()
+calculator = get_calculator_instance('aoki_velloso_1975')
 resultado = calculator.calcular(perfil, estaca)
 
 print(f"Resistência de Ponta: {resultado.resistencia_ponta:.2f} kN")
@@ -81,9 +81,9 @@ tipos = EstacaFactory.listar_tipos_estaca()
 # ['pre_moldada', 'escavada', 'helice_continua', 'raiz', 'franki', 'omega', 'metalica']
 
 # Criar estaca do catálogo
-estaca = EstacaFactory.criar_helice_continua('HELICE_500', cota=15)
-estaca = EstacaFactory.criar_metalica('HP_310x79', cota=20)
-estaca = EstacaFactory.criar_pre_moldada('CIRCULAR_330', cota=12)
+estaca = EstacaFactory.criar_helice_continua('HELICE_500', cota_assentamento=4)
+estaca = EstacaFactory.criar_metalica('HP_310x79', cota_assentamento=4)
+estaca = EstacaFactory.criar_pre_moldada('CIRCULAR_330', cota_assentamento=3)
 
 # Listar perfis disponíveis
 perfis = EstacaFactory.listar_perfis_por_tipo('helice_continua')
@@ -118,7 +118,7 @@ from calculus_core import (
     calcular_todos_metodos_uma_estaca,
     calcular_um_metodo_todas_estacas,
     calcular_todos_metodos_todas_estacas,
-    resultados_para_dataframe
+    serializar_resultados
 )
 
 # 1. Comparar todos os métodos para uma estaca
@@ -134,11 +134,10 @@ resultados = calcular_um_metodo_todas_estacas(
 # 3. Matriz completa de comparação
 resultados = calcular_todos_metodos_todas_estacas(
     perfil,
-    cota_assentamento=15
+    cota_assentamento=3
 )
 
 # Converter para lista de dicionários (compatível com JSON/Pandas)
-from calculus_core import serializar_resultados
 dados = serializar_resultados(resultados)
 
 # Exemplo: Usando com Pandas (opcional)
@@ -160,8 +159,10 @@ from calculus_core.domain.soil_investigation import (
 cpt = PerfilCPT(nome_sondagem='CPT-01')
 cpt.adicionar_medidas([
     (1.0, 2.5, 50.0),   # prof(m), qc(MPa), fs(kPa)
-    (1.2, 3.0, 60.0),
-    # ...
+    (2.0, 3.0, 60.0),
+    (3.0, 3.5, 70.0),
+    (4.0, 4.0, 80.0),
+    (5.0, 4.5, 90.0),
 ])
 
 # Converter para SPT (Correlação de Robertson 1983)
@@ -182,6 +183,7 @@ src/calculus_core/
 │   ├── pile_types.py     # Tipos específicos de estaca
 │   ├── pile_catalogs.py  # Catálogos pré-definidos
 │   ├── soil_types.py     # Sistema de mapeamento de solos
+│   ├── soil_investigation.py # Perfil CPT e conversões
 │   └── method_registry.py # Registro de métodos
 │
 ├── adapters/         # Infraestrutura
@@ -194,7 +196,7 @@ src/calculus_core/
 │   ├── cli.py        # Interface de linha de comando
 │   └── streamlit_app/# Interface web
 │
-└── bootstrap.py      # Injeção de dependências
+└── bootstrap.py      # Raiz de Composição (Composition Root)
 ```
 
 ## Extensibilidade
@@ -210,7 +212,10 @@ from calculus_core.domain.calculation import MetodoCalculo
     name='Meu Método',
     version='2024',
     description='Minha implementação',
+    reference='Referência bibliográfica',
     authors=['Autor'],
+    supported_pile_types=['all'],
+    supported_soil_types=['all'],
 )
 class MeuMetodoCalculator(MetodoCalculo):
     def calcular(self, perfil_spt, estaca):
@@ -229,8 +234,8 @@ from calculus_core.domain import map_soil_type, TipoSoloCanonical
 solo = TipoSoloCanonical.AREIA_ARGILOSA
 
 # Mapear para método específico
-nome_av = map_soil_type('aoki_velloso', solo)  # 'areia_argilosa'
-nome_dq = map_soil_type('decourt_quaresma', solo)  # 'areia'
+nome_av = map_soil_type(solo, 'aoki_velloso')  # 'areia_argilosa'
+nome_dq = map_soil_type(solo, 'decourt_quaresma')  # 'areia'
 ```
 
 ## Testes
@@ -249,9 +254,33 @@ uv run pytest tests/test_domain.py -v
 ## Interface Web
 
 ```bash
-uv run calculus-core
+uv run calculus-app
 # Abre interface Streamlit em http://localhost:8501
 ```
+
+## Interface Visual
+
+Abaixo estão algumas capturas de tela da interface web do **Calculus-Core**:
+
+### 1. Dashboard e Visão Geral
+![Interface Principal](docs/assets/1-app.png)
+*Visão geral do aplicativo e seleção de módulos.*
+
+### 2. Gestão de Dados de Solo
+![Dados de Solo](docs/assets/2-dados_solo.png)
+*Importação e edição de perfis de sondagem SPT e CPT.*
+
+### 3. Cálculos de Capacidade de Carga
+![Cálculo Simples](docs/assets/3-calculo_simples.png)
+*Cálculo detalhado para uma configuração específica de estaca e profundidade.*
+
+### 4. Análises em Lote (Batch)
+O módulo de lote permite comparações rápidas entre diferentes cenários:
+
+| Métodos | Estacas | Global |
+|:---:|:---:|:---:|
+| ![Métodos](docs/assets/4.1-calculo_lote_metodos.png) | ![Estacas](docs/assets/4.2-calculo_lote_estacas.png) | ![Global](docs/assets/4.3-calculo_lote_global.png) |
+| *Comparativo de métodos* | *Comparativo de estacas* | *Análise global* |
 
 ## Desenvolvimento
 
