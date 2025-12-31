@@ -1,5 +1,10 @@
 # Calculus-Core
 
+[![CI](https://github.com/kaiosilva-dataeng/calculus-core/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiosilva-dataeng/calculus-core/actions/workflows/ci.yml)
+[![Coverage](badges/coverage.svg)](https://github.com/kaiosilva-dataeng/calculus-core)
+[![PyPI](https://img.shields.io/pypi/v/calculus-core)](https://pypi.org/project/calculus-core/)
+[![Python](https://img.shields.io/pypi/pyversions/calculus-core)](https://pypi.org/project/calculus-core/)
+
 Biblioteca Python para cálculo de capacidade de carga de fundações profundas utilizando métodos semi-empíricos da literatura geotécnica brasileira.
 
 ## Métodos Implementados
