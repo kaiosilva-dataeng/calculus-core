@@ -81,13 +81,11 @@ wheels = [
 name = "calculus-core"
 version = "0.5.0"
 source = { editable = "." }
-dependencies = [
-    { name = "matplotlib" },
-]
 
 [package.optional-dependencies]
 streamlit = [
     { name = "altair" },
+    { name = "matplotlib" },
     { name = "pandas" },
     { name = "streamlit" },
 ]
@@ -106,7 +104,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "altair", marker = "extra == 'streamlit'", specifier = ">=5.5.0" },
-    { name = "matplotlib", specifier = ">=3.10.8" },
+    { name = "matplotlib", marker = "extra == 'streamlit'", specifier = ">=3.10.8" },
     { name = "pandas", marker = "extra == 'streamlit'", specifier = ">=2.3.0" },
     { name = "streamlit", marker = "extra == 'streamlit'", specifier = ">=1.46.0" },
 ]
