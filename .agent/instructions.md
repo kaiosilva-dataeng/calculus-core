@@ -2,6 +2,10 @@
 
 This document defines the technical standards and workflows that must be followed by any AI agent working on the `calculus-core` codebase.
 
+## Workflow Guidelines
+
+*   **Commits**: AI agents must **NEVER** perform git commits or pushes automatically. Commit actions should only be executed after an **explicit request** from the user.
+
 ## Python Development Standards
 
 All Python code must adhere to current community best practices:
