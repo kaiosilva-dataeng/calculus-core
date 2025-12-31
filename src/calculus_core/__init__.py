@@ -43,7 +43,7 @@ Using Pre-defined Pile Catalogs:
     estaca = EstacaFactory.criar_metalica('HP_310x79', cota=20)
 """
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 
 # =============================================================================
 # PUBLIC API
