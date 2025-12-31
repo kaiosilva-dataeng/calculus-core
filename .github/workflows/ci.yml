@@ -7,6 +7,10 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
   checks: write
@@ -55,14 +59,14 @@ jobs:
           junitxml-path: ./reports/junit.xml
 
       - name: Generate Coverage Badge
-        if: success() || failure()
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
         run: |
           uv pip install genbadge[coverage]
           mkdir -p badges
           uv run genbadge coverage -i reports/coverage.xml -o badges/coverage.svg
 
       - name: Commit Badge
-        if: success() || failure()
+        if: github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update coverage badge [skip ci]"

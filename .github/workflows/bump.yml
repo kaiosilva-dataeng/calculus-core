@@ -1,21 +1,27 @@
 name: Bump version
 
 on:
-  push:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
     branches:
       - main
-    paths-ignore:
-      - '.agent/**'
-      - 'CHANGELOG.md'
-      - 'pyproject.toml'
-      - 'src/calculus_core/__init__.py'
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
 
 jobs:
   bump:
-    if: "!startsWith(github.event.head_commit.message, 'bump:') && !startsWith(github.event.head_commit.message, 'chore(release):')"
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'bump:') &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'chore(release):') &&
+      !startsWith(github.event.workflow_run.head_commit.message, 'chore: update coverage badge')
     runs-on: ubuntu-latest
     name: "Bump version and update changelog"
     steps:
