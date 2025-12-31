@@ -1,173 +1,258 @@
 # Calculus-Core
 
-![Licença](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)
-![Python Version](https://img.shields.io/badge/python-3.9%2B-blue)
+Biblioteca Python para cálculo de capacidade de carga de fundações profundas utilizando métodos semi-empíricos da literatura geotécnica brasileira.
 
-**Calculus-Core** é uma biblioteca e ferramenta de engenharia geotécnica para o cálculo de capacidade de carga em fundações profundas (estacas). O projeto implementa métodos de cálculo semi-empíricos consagrados na literatura técnica brasileira e oferece múltiplas formas de interação, incluindo uma interface web interativa.
+## Métodos Implementados
 
----
-
-### Tabela de Conteúdos
-1.  [Principais Funcionalidades](#principais-funcionalidades)
-2.  [Instalação](#instalação)
-3.  [Como Usar](#como-usar)
-    - [Como uma Biblioteca Python](#1-como-uma-biblioteca-python)
-    - [Pela Interface Web (Streamlit)](#2-pela-interface-web-streamlit)
-4.  [Métodos Implementados](#métodos-implementados)
-5.  [Desenvolvimento](#desenvolvimento)
-6.  [Licença](#licença)
-
----
-
-## Principais Funcionalidades
-
-- **Múltiplos Métodos de Cálculo:** Implementação dos métodos de Aoki-Velloso (1975), Aoki-Velloso revisado por Laprovitera (1998), Décourt-Quaresma (1978) e Teixeira (1996).
-- **Interface Web Interativa:** Uma aplicação construída com [Streamlit](https://streamlit.io/) para facilitar a entrada de dados e a visualização dos resultados de forma amigável.
-- **Estrutura Modular:** O código é organizado como um pacote Python instalável, permitindo que as suas funcionalidades sejam facilmente importadas e utilizadas noutros projetos.
-
----
+| Método | Ano | Coeficientes |
+|--------|-----|--------------|
+| Aoki-Velloso | 1975 | K, α, F1, F2 |
+| Aoki-Velloso Laprovitera | 1988 | α corrigidos por tipo de estaca |
+| Décourt-Quaresma | 1978 | Np, Nl, α, β |
+| Teixeira | 1996 | α, β simplificados |
 
 ## Instalação
 
-Pode instalar o `calculus-core` diretamente do PyPI usando `pip`:
+### Instalação Básica (Apenas Core)
+Ideal para scripts e backend.
 
 ```bash
 pip install calculus-core
 ```
 
-## Métodos alternativos
+### Instalação com Interface Web
+Inclui Streamlit, Pandas e Altair.
 
-### Astral uv
-
-Siga os passos conforme a [documentação](https://docs.astral.sh/uv/getting-started/installation/).
-
-### Windows
-
-Abra o terminal PowerShell e execute o código abaixo.
-
-```powershell
-powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```bash
+pip install "calculus-core[streamlit]"
 ```
 
-macOS e Linux
+### Para Desenvolvimento
 
-```sh
-curl -LsSf https://astral.sh/uv/install.sh | sh
+```bash
+git clone https://github.com/usuario/calculus-core.git
+cd calculus-core
+uv sync --all-extras
 ```
 
-### Instalando para utilizar como biblioteca em projeto
-
-1. Inicie um projeto
-
-```sh
-uv init <nome-do-seu-projeto>
-```
-
-2. Acesse a pasta do projeto
-
-```
-cd <nome-do-seu-projeto>
-```
-
-3. Instale o pacote com uv:
-
-Use o uv para instalar diretamente do `PyPI`
-
-```sh
-uv add calculus-core
-```
-
-Ou diretamente pelo repósitorio
-
-```sh
-uv add https://github.com/kaiosilva-dataeng/calculus-core.git
-```
-
-### Instalando como ferramental para acesso da GUI no path global.
-
-Use o uv para instalar diretamente do `PyPI`
-
-```sh
-uv tool install calculus-core
-```
-
-Ou diretamente pelo repósitorio
-
-```sh
-uv tool install https://github.com/kaiosilva-dataeng/calculus-core.git
-```
-
-## Como usar
-
-O `calculus-core` pode ser utilizado de três formas distintas:
-
-### 1. Como uma Biblioteca Python
-
-Importe e utilize as classes e funções do pacote nos seus próprios scripts Python. Este é o método ideal para automação e integração com outras ferramentas.
-
-**Exemplo:**
-
-Importe e utilize as classes e funções do pacote nos seus próprios scripts Python. Este é o método ideal para automação e integração com outras ferramentas.
+## Uso Básico
 
 ```python
-# Faça a importação do objeto referente ao método de cálculo desejado
-from calculus_core.aoki_velloso import aoki_velloso_1975
-# Importe os models de Estaca e PerfilSPT
-from calculus_core.models import Estaca, PerfilSPT
+from calculus_core import create_aoki_velloso_1975, Estaca, PerfilSPT
 
-# Crie uma instancia do perfil SPT e adicione as camadas de solo.
-perfil_spt = PerfilSPT()
-perfil_spt.adicionar_medidas(
-    [
-        (1, 3, 'argila_arenosa'),
-        (2, 3, 'argila_arenosa'),
-        (3, 5, 'argila_arenosa'),
-        (4, 6, 'argila_arenosa'),
-        (5, 8, 'argila_arenosa'),
-        (6, 13, 'areia_argilosa'),
-        (7, 17, 'areia_argilosa'),
-        (8, 25, 'areia_argilosa'),
-        (9, 27, 'areia_silto_argilosa'),
-        (10, 32, 'areia_silto_argilosa'),
-        (11, 36, 'areia_silto_argilosa'),
-    ]
-)
+# Criar perfil SPT (suporta profundidades fracionárias)
+perfil = PerfilSPT(nome_sondagem='SP-01')
+perfil.adicionar_medidas([
+    (1.0, 3, 'argila_arenosa'),
+    (1.5, 4, 'argila_arenosa'),
+    (2.0, 6, 'areia_argilosa'),
+    (2.5, 8, 'areia_argilosa'),
+    (3.0, 12, 'areia'),
+])
 
-# Crie uma instancia da estaca
+# Criar estaca
 estaca = Estaca(
-    tipo='pré-moldada',
+    tipo='pré_moldada',
     processo_construcao='deslocamento',
-    formato='quadrada',
-    secao_transversal=0.3,
-    cota_assentamento=10,
+    formato='circular',
+    secao_transversal=0.3,  # diâmetro em metros
+    cota_assentamento=3.0,
 )
 
-# Execute o cálculo
-resultado = aoki_velloso_1975.calcular(perfil_spt, estaca)
-print(resultado)
+# Calcular
+calculator = create_aoki_velloso_1975()
+resultado = calculator.calcular(perfil, estaca)
+
+print(f"Resistência de Ponta: {resultado.resistencia_ponta:.2f} kN")
+print(f"Resistência Lateral: {resultado.resistencia_lateral:.2f} kN")
+print(f"Capacidade de Carga: {resultado.capacidade_carga:.2f} kN")
+print(f"Carga Admissível: {resultado.capacidade_carga_adm:.2f} kN")
 ```
 
-Veja mais exemplos em [Notebooks](notebooks).
+## Usando Catálogos de Estacas
 
-### 2. Pela Interface Web (Streamlit)
+O projeto inclui catálogos pré-definidos para todos os tipos de estacas:
 
-Para uma experiência mais visual e interativa, utilize a aplicação web. É ideal para verificações rápidas e para utilizadores que não são programadores.
+```python
+from calculus_core.domain import EstacaFactory
 
-Para iniciar a aplicação, execute o seguinte comando no seu terminal:
+# Listar tipos disponíveis
+tipos = EstacaFactory.listar_tipos_estaca()
+# ['pre_moldada', 'escavada', 'helice_continua', 'raiz', 'franki', 'omega', 'metalica']
 
-```sh
-calculus-app
+# Criar estaca do catálogo
+estaca = EstacaFactory.criar_helice_continua('HELICE_500', cota=15)
+estaca = EstacaFactory.criar_metalica('HP_310x79', cota=20)
+estaca = EstacaFactory.criar_pre_moldada('CIRCULAR_330', cota=12)
+
+# Listar perfis disponíveis
+perfis = EstacaFactory.listar_perfis_por_tipo('helice_continua')
+# ['HELICE_300', 'HELICE_350', 'HELICE_400', ...]
 ```
 
-O seu navegador abrirá automaticamente com a interface da aplicação.
+## Estratégias de Busca no Perfil SPT
 
-![Screenshot da Aplicação](docs/interface-web.png)
+```python
+# Busca exata (erro se não encontrar)
+medida = perfil.obter_medida(2.0, estrategia='exata')
 
-# Licença
+# Mais próxima (padrão)
+medida = perfil.obter_medida(2.3, estrategia='mais_proxima')
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+# Camada anterior (conservador)
+medida = perfil.obter_medida(2.5, estrategia='anterior')
 
-# Créditos
+# Interpolação linear
+medida = perfil.obter_medida(2.25, estrategia='interpolar')
 
-Desenvolvido como projeto de conclusão de curso de Engenharia Civil pelo IFTO - Campus Palmas.
-Por [Kaio Henrique Pires da Silva](https://www.linkedin.com/in/kaiosilva-dataeng/)
+# N_SPT médio em intervalo
+media = perfil.obter_n_spt_intervalo(1.0, 5.0, metodo='media')
+```
+
+## Cálculos em Lote (Batch API)
+
+Para comparar cenários, utilize as funções da API de lote:
+
+```python
+from calculus_core import (
+    calcular_todos_metodos_uma_estaca,
+    calcular_um_metodo_todas_estacas,
+    calcular_todos_metodos_todas_estacas,
+    resultados_para_dataframe
+)
+
+# 1. Comparar todos os métodos para uma estaca
+resultados = calcular_todos_metodos_uma_estaca(perfil, estaca)
+
+# 2. Comparar tipos de estaca para um método
+resultados = calcular_um_metodo_todas_estacas(
+    perfil,
+    metodo='aoki_velloso_1975',
+    cota_assentamento=10
+)
+
+# 3. Matriz completa de comparação
+resultados = calcular_todos_metodos_todas_estacas(
+    perfil,
+    cota_assentamento=15
+)
+
+# Converter para lista de dicionários (compatível com JSON/Pandas)
+from calculus_core import serializar_resultados
+dados = serializar_resultados(resultados)
+
+# Exemplo: Usando com Pandas (opcional)
+import pandas as pd
+df = pd.DataFrame(dados)
+```
+
+## Suporte a CPT e Conversão
+
+A biblioteca suporta dados de Cone Penetration Test (CPT) e conversão para SPT equivalente:
+
+```python
+from calculus_core.domain.soil_investigation import (
+    PerfilCPT,
+    converter_cpt_para_spt
+)
+
+# Criar perfil CPT
+cpt = PerfilCPT(nome_sondagem='CPT-01')
+cpt.adicionar_medidas([
+    (1.0, 2.5, 50.0),   # prof(m), qc(MPa), fs(kPa)
+    (1.2, 3.0, 60.0),
+    # ...
+])
+
+# Converter para SPT (Correlação de Robertson 1983)
+spt_equivalente = converter_cpt_para_spt(cpt, 'robertson_1983')
+
+# Usar perfil convertido nos cálculos tradicionais
+resultado = calculator.calcular(spt_equivalente, estaca)
+```
+
+## Arquitetura
+
+```
+src/calculus_core/
+├── domain/           # Lógica de negócio pura
+│   ├── model.py          # Entidades (Estaca, PerfilSPT)
+│   ├── value_objects.py  # Objetos de valor
+│   ├── calculation/      # Estratégias de cálculo
+│   ├── pile_types.py     # Tipos específicos de estaca
+│   ├── pile_catalogs.py  # Catálogos pré-definidos
+│   ├── soil_types.py     # Sistema de mapeamento de solos
+│   └── method_registry.py # Registro de métodos
+│
+├── adapters/         # Infraestrutura
+│   └── coefficients/ # Provedores de coeficientes
+│
+├── service_layer/    # Casos de uso
+│   └── services.py   # Serviços de aplicação
+│
+├── entrypoints/      # Interfaces externas
+│   ├── cli.py        # Interface de linha de comando
+│   └── streamlit_app/# Interface web
+│
+└── bootstrap.py      # Injeção de dependências
+```
+
+## Extensibilidade
+
+### Adicionar Novo Método de Cálculo
+
+```python
+from calculus_core.domain.method_registry import register_method
+from calculus_core.domain.calculation import MetodoCalculo
+
+@register_method(
+    method_id='meu_metodo_2024',
+    name='Meu Método',
+    version='2024',
+    description='Minha implementação',
+    authors=['Autor'],
+)
+class MeuMetodoCalculator(MetodoCalculo):
+    def calcular(self, perfil_spt, estaca):
+        # Implementação
+        pass
+```
+
+### Sistema de Tipos de Solo
+
+O sistema de mapeamento de solos permite que cada método use sua própria classificação:
+
+```python
+from calculus_core.domain import map_soil_type, TipoSoloCanonical
+
+# Tipo canônico
+solo = TipoSoloCanonical.AREIA_ARGILOSA
+
+# Mapear para método específico
+nome_av = map_soil_type('aoki_velloso', solo)  # 'areia_argilosa'
+nome_dq = map_soil_type('decourt_quaresma', solo)  # 'areia'
+```
+
+## Testes
+
+```bash
+# Rodar todos os testes
+uv run pytest
+
+# Com cobertura
+uv run pytest --cov=calculus_core
+
+# Testes específicos
+uv run pytest tests/test_domain.py -v
+```
+
+## Interface Web
+
+```bash
+uv run calculus-core
+# Abre interface Streamlit em http://localhost:8501
+```
+
+## Licença
+
+MIT License - veja [LICENSE](LICENSE) para detalhes.
