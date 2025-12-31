@@ -44,7 +44,7 @@ class TestResultadoCalculo:
         assert resultado.to_dict()['cota'] == 5
 
     def test_validates_inputs(self):
-        with pytest.raises(ValueError, match='cota.*positiva'):
+        with pytest.raises(ValueError, match='Cota deve ser >= 1'):
             ResultadoCalculo(
                 cota=0,  # Invalid
                 resistencia_ponta=100.0,
