@@ -4,7 +4,10 @@ This document defines the technical standards and workflows that must be followe
 
 ## Workflow Guidelines
 
-*   **Commits**: AI agents must **NEVER** perform git commits or pushes automatically. Commit actions should only be executed after an **explicit request** from the user.
+*   **Commits e Push**: AI agents must **NEVER** perform git commits or pushes automatically. After completing any work:
+    1.  **Always ask the user** if they want to review the changes first OR proceed with commit/push.
+    2.  Wait for **explicit user confirmation** before executing any `git add`, `git commit`, or `git push` commands.
+    3.  This rule applies even when fixing CI errors or making "obvious" corrections.
 
 ## Python Development Standards
 
