@@ -253,6 +253,20 @@ uv run calculus-core
 # Abre interface Streamlit em http://localhost:8501
 ```
 
+## Desenvolvimento
+
+Este projeto utiliza [Commitizen](https://commitizen-tools.github.io/commitizen/) para padronização de commits e gerenciamento de versões.
+
+Para realizar um commit padronizado:
+```bash
+uv run task cz
+```
+
+Para gerar um novo release (bump de versão e changelog):
+```bash
+uv run cz bump
+```
+
 ## Licença
 
 MIT License - veja [LICENSE](LICENSE) para detalhes.
