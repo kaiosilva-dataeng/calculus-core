@@ -56,8 +56,11 @@ As atualizações mais recentes focaram em resolver as limitações de "vida rea
 - **Release Automático via OIDC**: Implementação de um fluxo de trabalho robusto que publica automaticamente no PyPI e no GitHub Releases ao detectar uma nova tag de versão (`v*`). Utiliza *Trusted Publishing* via OIDC (OpenID Connect), eliminando a necessidade de gerenciar tokens de API inseguros.
 - **Suporte a Profundidade Ponto-Flutuante**: Refatoração completa para suportar registros de solo em profundidades como `1.5m` ou `2.75m`, removendo a limitação de números inteiros.
 - **Interface Streamlit Premium**: Modernização visual da UI, com melhores gráficos, tabelas dinâmicas e aviso de depreciações corrigidos.
-- **Verificação de Exemplos**: Automação que garante que todos os exemplos apresentados no `README.md` funcionam corretamente com a versão atual do código.
-- **Audit de Arquitetura**: Revisão contínua para garantir que o projeto permanece modular e fácil de estender para novos tipos de solo e métodos de cálculo.
+- **Modernização do Ambiente (Python 3.14)**: Pioneirismo na adoção do Python 3.14 para desenvolvimento e CI, garantindo que o motor de cálculo esteja pronto para as futuras otimizações da linguagem.
+- **Otimização de Dependências**: Refatoração do `pyproject.toml` para mover dependências pesadas de visualização (`matplotlib`) para grupos opcionais, tornando o core da biblioteca mais leve para integração em outros sistemas.
+- **Transparência e Badges**: Implementação de badges automáticos no `README.md` refletindo o status real de CI, cobertura (via SVG dinâmico), versão PyPI e compatibilidade Python.
+- **Verificação de Exemplos e Ativos**: Automação que garante que todos os exemplos do `README.md` funcionam e que as imagens da documentação são exibidas corretamente em portais externos como o PyPI via URLs absolutas.
+- **Governança de IA**: Estabelecimento de regras estritas de workflow para agentes de IA para garantir integridade do histórico git e revisão humana obrigatória.
 
 ---
 
