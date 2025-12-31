@@ -49,7 +49,8 @@ class ResultadoCalculo:
     Immutable result of a single load capacity calculation.
 
     Contains the complete output of a calculation for a specific
-    pile installation depth (cota).
+    pile installation depth (cota). Results include tip and skin resistance,
+    total capacity, and admissible capacity.
     """
 
     cota: int
