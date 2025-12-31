@@ -20,7 +20,7 @@ class TestTipoSoloCanonical:
     """Tests for canonical soil types."""
 
     @pytest.mark.parametrize(
-        'input_str,expected',
+        ('input_str', 'expected'),
         [
             ('argila', TipoSoloCanonical.ARGILA),
             ('argila arenosa', TipoSoloCanonical.ARGILA_ARENOSA),

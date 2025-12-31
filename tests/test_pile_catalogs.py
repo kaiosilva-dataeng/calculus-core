@@ -23,7 +23,7 @@ class TestCatalogosExistem:
     """Verify catalogs are properly populated."""
 
     @pytest.mark.parametrize(
-        'catalogo,min_count',
+        ('catalogo', 'min_count'),
         [
             (CATALOGO_PRE_MOLDADAS, 10),
             (CATALOGO_ESCAVADAS, 8),
@@ -40,7 +40,7 @@ class TestFactoryCatalogIntegration:
     """Tests for factory integration with catalogs."""
 
     @pytest.mark.parametrize(
-        'tipo,perfil,expected_tipo',
+        ('tipo', 'perfil', 'expected_tipo'),
         [
             ('pre_moldada', 'CIRCULAR_330', 'pré_moldada'),
             ('escavada', 'ESCAVADA_600_REV', 'escavada'),
